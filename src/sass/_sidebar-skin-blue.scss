@@ -1,0 +1,129 @@
+.sidebar.sidebar-skin-blue {
+
+    @import "~bootstrap-sass/assets/stylesheets/bootstrap/variables";
+    @import "~bootstrap-sass/assets/stylesheets/bootstrap/mixins";
+    @import "~themekit-vue/src/sass/variables/colors/variables";
+
+    /*
+     * COLORS
+     */
+    $sidebar-bg: hsl(hue($blue-500), 29%, 24%);
+    $sidebar-text-color: lighten($sidebar-bg, 54%);
+
+    // borders
+    $sidebar-border-color: lighten($sidebar-bg, 5%);
+
+    // category
+    $sidebar-category-color: $blue-400;
+
+    // icons
+    $sm-icon-color: $teal-500;
+    $sm-icon-bg: lighten($sidebar-bg, 8%);
+    $sm-iconsblock-icon-color: $sidebar-text-color;
+    $sm-active-iconsblock-icon-bg: $sm-icon-color;
+    $sm-active-iconsblock-activebuttonbg-icon-bg: $brand-primary;
+
+    // menu button
+    $sm-active-button-color: #fff;
+    $sm-active-button-bg: desaturate($blue-500, 13%);
+
+    // open menu button
+    $sm-open-button-color: #fff;
+    $sm-open-button-bg: lighten($sidebar-bg, 2%);
+    $sm-open-icon-bg: lighten($sidebar-bg, 20%);
+
+    /*
+     * SIZING, SPACING, OTHER
+     */
+    
+    $sidebar-container-border-width: 0;
+    $sm-spacing-horizontal: 0;
+
+    // menu buttons
+    $sm-button-height: 48px;
+    $sm-button-font-size: 1.15rem;
+
+    // submenu buttons
+    $ssm-button-height: 32px;
+    $ssm-button-font-size: 0.9rem;
+
+    // default variables
+    @import "~themekit-vue/src/sass/variables";
+    
+    // mixins
+    @import "~themekit-vue/src/sass/mixins/sidebar/theme";
+    
+    // Sidebar theme
+    @include sidebar-variant();
+    
+    // Sidebar menu
+    @import "~themekit-vue/src/sass/sidebar-menu/sidebar-menu";
+
+    // Sidebar menu utils
+    @import "~themekit-vue/src/sass/sidebar-menu/utils";
+
+    // Sidebar elements
+    @include sidebar-list-group-menu-variant();
+ 
+    .sidebar-btn {
+        @include button-variant(#fff, $sm-active-button-bg, $sm-active-button-bg);
+    }
+    .sidebar-form-control, 
+    .form-control-default {
+        background: darken($sidebar-bg, 4%);
+        border-color: darken($sidebar-bg, 4%);
+        color: $sidebar-text-color;
+    }
+    .checkbox label {
+        color: $sm-button-color;
+    }
+    .sidebar-progress {
+        background-color: darken($sidebar-bg, 5%);
+    }
+    .sidebar-badge {
+        background: darken($sidebar-bg, 7%);
+    }
+    .sidebar-feed .sidebar-feed-item {
+        color: $sidebar-text-color;
+        background: darken($sidebar-bg, 4%);
+        a {
+            color: $sidebar-text-color;
+        }
+    }
+    .tabbable.sidebar-tabbable .nav-tabs {
+        border-color: $sidebar-border-color;
+        > li.active > a {
+            &, &:focus, &:hover {
+                border-color: $sidebar-border-color;
+                background-color: darken($sidebar-bg, 4%);
+            }
+        }
+    }
+    .sidebar-datepicker {
+        table {
+            thead tr {
+                background: desaturate($blue-500, 13%) !important;
+                th.datepicker-switch, th.next, th.prev {
+                    &:hover {
+                        background: desaturate($blue-500, 13%);
+                    }
+                }
+            }
+            tr td {
+                &.day, .month, .year {
+                    color: $sm-button-color;
+                    &.old {
+                        color: lighten($sidebar-bg, 10%);
+                    }
+                    &.active {
+                        background: desaturate($blue-500, 13%) !important;
+                        color: $white;
+                    }
+                    &:hover {
+                        background: darken($sidebar-bg, 10%);
+                    }
+                }
+            }
+        }
+    }
+}

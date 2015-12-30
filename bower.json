@@ -1,0 +1,19 @@
+{
+  "name": "themekit",
+  "description": "ThemeKit Lite",
+  "license": "ISC",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "~3.3.6",
+    "jquery": "~2.1.4",
+    "jquery.breakpoints": "*",
+    "font-awesome": "~4.5.0",
+    "simplebar": "lazabogdan/simplebar#master",
+    "bootstrap-datepicker": "~1.5.0",
+    "material-design-iconic-font": "~1.1.1",
+    "load_image": "mixonic/load_image",
+    "mprogress": "lazabogdan/MProgress.js#master",
+    "modernizr": "~2.8.3",
+    "dropzone": "~4.0.1"
+  }
+}

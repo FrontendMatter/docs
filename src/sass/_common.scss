@@ -1,0 +1,7 @@
+// bootstrap-sass
+// required for sass-loader
+$icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
+
+@import "~bootstrap-sass/assets/stylesheets/bootstrap/mixins";
+
+@import "~themekit-vue/src/sass/variables";
