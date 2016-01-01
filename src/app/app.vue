@@ -118,14 +118,14 @@
 </template>
 
 <script>
-	import LayoutTransition from 'themekit-vue/src/vue/components/layout/layout-transition.vue'
-	import Sidebar from 'themekit-vue/src/vue/components/sidebar/sidebar.vue'
-	import SidebarTransition from 'themekit-vue/src/vue/components/sidebar/sidebar-transition.vue'
-	import SidebarToggleButton from 'themekit-vue/src/vue/components/sidebar/sidebar-toggle-button.vue'
-	import SidebarMenu from 'themekit-vue/src/vue/components/sidebar-menu/sidebar-menu.vue'
-	import SidebarCollapseItem from 'themekit-vue/src/vue/components/sidebar-collapse-menu/sidebar-collapse-item.vue'
-	import Navbar from 'themekit-vue/src/vue/components/navbar/navbar.vue'
-	import TabsNav from 'themekit-vue/src/vue/components/tabs/tabs-nav.vue'
+	import { LayoutTransition } from 'themekit-vue'
+	import { Sidebar } from 'themekit-vue'
+	import { SidebarTransition } from 'themekit-vue'
+	import { SidebarToggleButton } from 'themekit-vue'
+	import { SidebarMenu } from 'themekit-vue'
+	import { SidebarCollapseItem } from 'themekit-vue'
+	import { Navbar } from 'themekit-vue'
+	import { TabsNav } from 'themekit-vue'
 
 	export default {
 		replace: false,
@@ -151,7 +151,12 @@
 						'fall-down'
 					]
 				},
-				menus: [{
+				components: []
+			}
+		},
+		computed: {
+			menus () { 
+				return [{
 					class: {
 						'sm-icons-right': false,
 						'sm-icons-block': true,
@@ -164,71 +169,36 @@
 				}, {
 					heading: 'Components',
 					class: {
-						'ssm-item-bordered': true,
+						'sm-item-bordered': true,
 						'sm-active-button-bg': true,
-						'sm-condensed': false
+						'sm-condensed': true
 					},
-					children: [
-						{ label: 'Sidebar', route: { name: 'component', params: { id: 'sidebar' } } }, 
-						{ label: 'Sidebar Toggle Button', route: { name: 'component', params: { id: 'sidebar-toggle-button' } } }, 
-						{ label: 'Sidebar Menu', 
-							children: [
-								{ label: 'Sidebar Menu', route: { name: 'component', params: { id: 'sidebar-menu' } } }, 
-								{ label: 'Sidebar Menu Item', route: { name: 'component', params: { id: 'sidebar-menu-item' } } }
-							] 
-						}, 
-						{ label: 'Sidebar Elements', 
-							children: [
-								{ label: 'Sidebar Block', route: { name: 'component', params: { id: 'sidebar-block' } } }, 
-								{ label: 'Sidebar Feed', route: { name: 'component', params: { id: 'sidebar-feed' } } },
-								{ label: 'Sidebar Feed Item', route: { name: 'component', params: { id: 'sidebar-feed-item' } } },
-								{ label: 'Sidebar Tabs', route: { name: 'component', params: { id: 'sidebar-tabs' } } },
-								{ label: 'Sidebar Tab Pane', route: { name: 'component', params: { id: 'sidebar-tab-pane' } } }
-							] 
-						},
-						{ label: 'Navbar', route: { name: 'component', params: { id: 'navbar' } } },
-						{ label: 'Navbar Elements' },
-						{ label: 'Layout Elements' },
-						{ label: 'Cover', 
-							children: [
-								{ label: 'Cover Banner', route: { name: 'component', params: { id: 'cover-banner' } } }, 
-								{ label: 'Cover Link', route: { name: 'component', params: { id: 'cover-link' } } },
-								{ label: 'Cover Overlay', route: { name: 'component', params: { id: 'cover-overlay' } } },
-								{ label: 'Cover Panel', route: { name: 'component', params: { id: 'cover-panel' } } }
-							] 
-						},
-						{ label: 'Expandable', 
-							children: [
-								{ label: 'Expandable' }, 
-								{ label: 'Expandable Panel' }
-							] 
-						},
-						{ label: 'Isotope' },
-						{ label: 'Mprogress' },
-						{ label: 'Carousel', 
-							children: [
-								{ label: 'Carousel' }, 
-								{ label: 'Carousel Item' }
-							] 
-						},
-						{ label: 'Tabs', 
-							children: [
-								{ label: 'Tabs' }, 
-								{ label: 'Tab Pane' },
-								{ label: 'Tabs Nav' }
-							] 
-						},
-						{ label: 'Modal' },
-						{ label: 'Dropzone', 
-							children: [
-								{ label: 'Dropzone' }, 
-								{ label: 'Dropzone Control' },
-								{ label: 'Dropzone Control Progress' }
-							] 
-						}
-					]
+					children: this.componentsMenu
 				}]
+			},
+			componentsMenu () {
+				let components = []
+				if (this.components && this.components.length) {
+					this.components.forEach((component) => {
+						components.push({
+							label: component.label,
+							route: {
+								name: 'component',
+								params: {
+									id: component.id
+								}
+							}
+						})
+					})
+				}
+				
+				return components
 			}
+		},
+		ready () {
+			this.$http.get('components').then((response) => {
+				this.components = response.data
+			})
 		},
 		components: {
 			LayoutTransition,

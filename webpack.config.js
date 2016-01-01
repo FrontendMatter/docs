@@ -6,7 +6,6 @@ var configInst = new Config();
 module.exports = extend(base, {
     entry: {
         app: [ configInst.getSrcPath('js', 'app.js') ],
-        layouts: [ configInst.getSrcPath('js', 'layouts.js') ],
         demo: [ configInst.getSrcPath('js', 'demo.js') ],
         vendor: [ configInst.getSrcPath('js', 'vendor.js') ]
     }

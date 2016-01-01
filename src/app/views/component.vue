@@ -2,27 +2,43 @@
 	<tabs nav-id="tabs-navbar" :class="tabs">
 		<tab-pane active icon="fa fa-fw fa-file-text-o" label="Docs">
 			<div class="docs-container">
-				<h1 class="component-name">{{ componentName }}</h1>
+				
 				<template v-if="component">
-					{{{ component.description | unindent | marked }}}
+					<h1 class="component-name">{{ component.label }}</h1>
+					<template v-if="component.description">
+						{{{ component.description | unindent | marked }}}
+					</template>
 
-					<h3>Properties</h3>
-					<template v-for="(name, prop) in component.props">
-						<h4>{{ name }}</h4>
-						<p>{{ prop.description }}</p>
-						<h5>type: <code>{{ prop.type.name }}</code></h5>
-						<h5 v-if="prop.default">default: <code>{{ prop.default }}</code></h5>
-						<hr>
+					<template v-if="component.props.length">
+						<h3>Properties</h3>
+						<template v-for="prop in component.props">
+							<h4>{{ prop.name }}</h4>
+							<p v-if="prop.description">{{{ prop.description | unindent | marked }}}</p>
+							<h5>type: <code>{{ prop.type }}</code></h5>
+							<h5 v-if="prop.default">default: <code>{{ prop.default }}</code></h5>
+							<h5 v-if="prop.required">required: <code>true</code></h5>
+							<hr>
+						</template>
+					</template>
+
+					<template v-if="component.events.length">
+						<h3>Events</h3>
+						<template v-for="event in component.events">
+							<h4>{{ event.name }}</h4>
+							<p v-if="event.description">{{{ event.description | unindent | marked }}}</p>
+							<pre>{{ event.event }}</pre>
+							<hr>
+						</template>
 					</template>
 				</template>
 
-				<template v-if="!component && !componentError">
-					<h3>Loading component ...</h3>
-				</template>
-
-				<template v-if="componentError">
-					<h3>The component was not found.</h3>
-					<p>{{ componentError }}</p>
+				<template v-if="!component">
+					<h1>{{ componentName }}</h1>
+					<h3 v-if="!componentError">Loading component ...</h3>
+					<template v-else>
+						<h3>The component was not found.</h3>
+						<p>{{ componentError }}</p>
+					</template>
 				</template>
 			</div>
 		</tab-pane>
@@ -33,8 +49,8 @@
 </template>
 
 <script>
-	import Tabs from 'themekit-vue/src/vue/components/tabs/tabs.vue'
-	import TabPane from 'themekit-vue/src/vue/components/tabs/tab-pane.vue'
+	import { Tabs } from 'themekit-vue'
+	import { TabPane } from 'themekit-vue'
 	import marked from 'marked'
 
 	marked.setOptions({
@@ -64,22 +80,23 @@
 			return {
 				component: null,
 				componentError: null,
+				componentInfo: null,
 				tabId: null
 			}
 		},
 		route: {
 			canReuse: false,
-			data () {
-				try {
-					return {
-						component: require(`themekit-vue/docs/components/${ this.$route.params.id }.vue`)
-					}
-				}
-				catch (e) {
-					return {
-						componentError: e.message
-					}
-				}
+			data ({ to, next }) {
+				this.$http.get(`components/${ to.params.id }`).then((response) => {
+					next({
+						component: response.data
+					})
+				})
+				.catch((response) => {
+					next({
+						componentError: response.data
+					})
+				})
 			}
 		},
 		computed: {

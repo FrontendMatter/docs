@@ -9,6 +9,9 @@ import 'bootstrap-sass/assets/stylesheets/_bootstrap'
 import 'material-design-iconic-font/css/material-design-iconic-font'
 import 'font-awesome/css/font-awesome'
 
+// THEMEKIT
+import 'themekit-vue/dist/themekit.css'
+
 // THEMEKIT PAGE
 import 'themekit-vue/src/sass/page/_scaffolding'
 import 'themekit-vue/src/sass/page/_typography'
@@ -39,11 +42,8 @@ import 'modernizr/modernizr'
 // Vue library
 import Vue from 'vue'
 
-// Vue Directives
-import Scrollable from 'themekit-vue/src/vue/directives/scrollable'
-import Datepicker from 'themekit-vue/src/vue/directives/datepicker'
-import Highlight from '../app/directives/highlight'
+// Load ThemeKit
+import ThemeKit from 'themekit-vue'
 
-Vue.directive('scrollable', Scrollable)
-Vue.directive('datepicker', Datepicker)
-Vue.directive('highlight', Highlight)
+// Setup
+Vue.use(ThemeKit)
