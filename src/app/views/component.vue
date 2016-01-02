@@ -37,7 +37,7 @@
 					<h3 v-if="!componentError">Loading component ...</h3>
 					<template v-else>
 						<h3>The component was not found.</h3>
-						<p>{{ componentError }}</p>
+						<p v-html="componentError"></p>
 					</template>
 				</template>
 			</div>
@@ -110,7 +110,7 @@
 			},
 			hasDemo () {
 				try {
-					require(`themekit-vue/docs/demo/${ this.$route.params.id }.vue`)
+					require(`themekit-vue/resources/docs/src/demo/${ this.$route.params.id }.vue`)
 					return true
 				}
 				catch (e) {

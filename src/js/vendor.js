@@ -36,6 +36,7 @@ import 'themekit-vue/src/sass/elements/_panel'
  * SCRIPTS
  */
  
+import 'jquery'
 import 'bootstrap-sass/assets/javascripts/bootstrap'
 import 'modernizr/modernizr'
 

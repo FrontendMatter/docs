@@ -9,7 +9,7 @@ router.map({
 	'/:id': {
 		name: 'demo',
 		component: function (resolve) {
-			require([`themekit-vue/docs/demo/${ router.app.$route.params.id }`], resolve)
+			require([`themekit-vue/resources/docs/src/demo/${ router.app.$route.params.id }`], resolve)
 		}
 	}
 })

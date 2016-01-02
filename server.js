@@ -16,7 +16,7 @@ var node_modules = path.resolve(__dirname, 'node_modules')
 
 router.route('/components')
 	.get(function(req, res) {
-		glob('themekit-vue/src/vue/components/**/*.vue', {
+		glob('themekit-vue/src/components/**/*.vue', {
 			cwd: node_modules
 		}, function (err, files) {
 			var components = [];
@@ -48,13 +48,14 @@ router.route('/components/:id')
 
 		var id = req.params.id
 		var propertyName = pascalCase(id)
-		var package = require('themekit-vue')
+		var package = require('themekit-vue/resources/docs/dist/docs')
 		var component = package[propertyName]
 
 		var props = []
 		forOwn(component.props, (prop, name) => {
 			props.push({
 				name: hyphenate(name),
+				description: prop.description,
 				type: prop.type.name,
 				default: prop.default,
 				required: prop.required
@@ -72,6 +73,7 @@ router.route('/components/:id')
 		return res.json({
 			id: id,
 			label: properCase(unhyphenate(id)),
+			description: component.description,
 			props: props,
 			events: events
 		})
