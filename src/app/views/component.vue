@@ -9,6 +9,22 @@
 						{{{ component.description | unindent | marked }}}
 					</template>
 
+					<template v-if="component.requirements.length">
+						<h3>Requirements</h3>
+						<blockquote>
+							The {{ component.label }} component <strong>must be used</strong> as children of the following component(s):
+							<ul class="list-unstyled">
+								<li v-for="required in component.requirements">
+									<a v-link="{ name: 'component', params: { id: required.id } }" v-text="required.label"></a>
+								</li>
+							</ul>
+						</blockquote>
+					</template>
+
+					<template v-if="component.details">
+						{{{ component.details | unindent | marked }}}
+					</template>
+
 					<template v-if="!component.template && !component.mixins.length">
 						<h3>Note</h3>
 						<blockquote>
@@ -19,7 +35,7 @@
 						</blockquote>
 					</template>
 
-					<h3 v-if="extendedBy.length || usedBy.length">Structure</h3>
+					<h3 v-if="extendedBy.length || usedBy.length">Hierarchy</h3>
 					<template v-if="extendedBy.length">
 						<blockquote>
 							The {{ component.label }} component is extended by:
@@ -198,6 +214,13 @@
 						})
 					})
 					component.components = components
+
+					component.requirements = (component.requirements || []).map((id) => {
+						return {
+							id: id,
+							label: properCase(unhyphenate(id))
+						}
+					})
 
 					component = merge({
 						id: id,
