@@ -9,6 +9,18 @@
 						{{{ component.description | unindent | marked }}}
 					</template>
 
+					<template v-if="component.mixins.length">
+						<h3>Mixins</h3>
+						<blockquote>
+							The {{ component.label }} component extends:
+							<ul class="list-unstyled">
+								<li v-for="mix in component.mixins">
+									<a v-link="{ name: 'component', params: { id: mix.name } }" v-text="mix.label"></a>
+								</li>
+							</ul>
+						</blockquote>
+					</template>
+
 					<template v-if="component.props.length">
 						<h3>Properties</h3>
 						<template v-for="prop in component.props">
@@ -97,6 +109,15 @@
 					let propertyName = pascalCase(id)
 					let component = Docs[propertyName]
 
+					let mixins = component.mixins || []
+					mixins = mixins.filter((mix) => {
+						return typeof mix.name !== 'undefined'
+					})
+					.map((mix) => {
+						mix.label = pascalCase(mix.name)
+						return mix
+					})
+
 					let props = []
 					forOwn(component.props, (prop, name) => {
 						props.push({
@@ -122,7 +143,8 @@
 							label: properCase(unhyphenate(id)),
 							description: component.description,
 							props: props,
-							events: events
+							events: events,
+							mixins: mixins
 						}
 					})
 				}
@@ -221,5 +243,8 @@
 	}
 	.component-name {
 		text-transform: capitalize;
+	}
+	blockquote {
+		background: #f9f9f9;
 	}
 </style>
