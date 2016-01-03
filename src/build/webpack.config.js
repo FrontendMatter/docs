@@ -1,10 +1,11 @@
 var extend = require('themekit-webpack-config/extend')
-var base = require('themekit-webpack-config/base')
+var Base = require('themekit-webpack-config/base')
+var config = new Base()
 
-module.exports = extend(base.getConfig(), {
+module.exports = extend(config.getConfig(), {
     entry: {
-        app: [ base.srcPath('js', 'app.js') ],
-        demo: [ base.srcPath('js', 'demo.js') ],
-        vendor: [ base.srcPath('js', 'vendor.js') ]
+        app: [ config.srcPath('js', 'app.js') ],
+        demo: [ config.srcPath('js', 'demo.js') ],
+        vendor: [ config.srcPath('js', 'vendor.js') ]
     }
 })
