@@ -9,6 +9,51 @@
 						{{{ component.description | unindent | marked }}}
 					</template>
 
+					<template v-if="!component.template && !component.mixins.length">
+						<h3>Note</h3>
+						<blockquote>
+							The {{ component.label }} component does not have a template.
+							<template v-if="extendedBy.length">
+								It's likely that this component is not meant to be used directly. Instead, you probably want to use one of the components extending {{ component.label }}, below.
+							</template>
+						</blockquote>
+					</template>
+
+					<h3 v-if="extendedBy.length || usedBy.length">Structure</h3>
+					<template v-if="extendedBy.length">
+						<blockquote>
+							The {{ component.label }} component is extended by:
+							<ul class="list-unstyled">
+								<li v-for="extending in extendedBy">
+									<a v-link="{ name: 'component', params: { id: extending.id } }" v-text="extending.label"></a>
+								</li>
+							</ul>
+						</blockquote>
+					</template>
+
+					<template v-if="usedBy.length">
+						<blockquote>
+							The {{ component.label }} component is used by:
+							<ul class="list-unstyled">
+								<li v-for="using in usedBy">
+									<a v-link="{ name: 'component', params: { id: using.id } }" v-text="using.label"></a>
+								</li>
+							</ul>
+						</blockquote>
+					</template>
+
+					<template v-if="component.components.length">
+						<h3>Components</h3>
+						<blockquote>
+							The {{ component.label }} component is using:
+							<ul class="list-unstyled">
+								<li v-for="used in component.components">
+									<a v-link="{ name: 'component', params: { id: used.id } }" v-text="used.label"></a>
+								</li>
+							</ul>
+						</blockquote>
+					</template>
+
 					<template v-if="component.mixins.length">
 						<h3>Mixins</h3>
 						<blockquote>
@@ -24,22 +69,23 @@
 					<template v-if="component.props.length">
 						<h3>Properties</h3>
 						<template v-for="prop in component.props">
-							<h4>{{ prop.name }}</h4>
-							<p v-if="prop.description">{{{ prop.description | unindent | marked }}}</p>
-							<h5>type: <code>{{ prop.type }}</code></h5>
-							<h5 v-if="prop.default">default: <code>{{ prop.default }}</code></h5>
-							<h5 v-if="prop.required">required: <code>true</code></h5>
-							<hr>
+							<div class="panel panel-default panel-body">
+								<h4>{{ prop.name }}</h4>
+								<p v-if="prop.description">{{{ prop.description | unindent | marked }}}</p>
+								<h5>type: <code>{{ prop.type }}</code></h5>
+								<h5 v-if="prop.default">default: <code>{{ prop.default }}</code></h5>
+								<h5 v-if="prop.required">required: <code>true</code></h5>
+							</div>
 						</template>
 					</template>
 
 					<template v-if="component.events.length">
-						<h3>Events</h3>
+						<h3>Event listeners</h3>
+						<p>The {{ component.label }} component listens and responds to the following events:</p>
 						<template v-for="event in component.events">
 							<h4>{{ event.name }}</h4>
 							<p v-if="event.description">{{{ event.description | unindent | marked }}}</p>
 							<pre><code v-highlight="event.event" lang="javascript"></code></pre>
-							<hr>
 						</template>
 					</template>
 				</template>
@@ -69,7 +115,9 @@
 	import unhyphenate from 'mout/string/unhyphenate'
 	import properCase from 'mout/string/properCase'
 	import pascalCase from 'mout/string/pascalCase'
+	import keys from 'mout/object/keys'
 	import forOwn from 'mout/object/forOwn'
+	import merge from 'mout/object/merge'
 
 	marked.setOptions({
 		highlight: function (code) {
@@ -106,17 +154,19 @@
 			data ({ to, next }) {
 				try {
 					let id = to.params.id
+					let label = properCase(unhyphenate(id))
 					let propertyName = pascalCase(id)
-					let component = Docs[propertyName]
+					let component = Object.assign({}, Docs[propertyName])
 
 					let mixins = component.mixins || []
 					mixins = mixins.filter((mix) => {
 						return typeof mix.name !== 'undefined'
 					})
 					.map((mix) => {
-						mix.label = pascalCase(mix.name)
+						mix.label = properCase(unhyphenate(mix.name))
 						return mix
 					})
+					component.mixins = mixins
 
 					let props = []
 					forOwn(component.props, (prop, name) => {
@@ -128,6 +178,7 @@
 							required: prop.required
 						})
 					})
+					component.props = props
 
 					let events = []
 					forOwn(component.events, (event, name) => {
@@ -136,16 +187,25 @@
 							event: event.toString()
 						})
 					})
+					component.events = events
+
+					let components = []
+					forOwn(component.components, (component, name) => {
+						let id = hyphenate(name)
+						components.push({
+							id: id,
+							label: properCase(unhyphenate(id))
+						})
+					})
+					component.components = components
+
+					component = merge({
+						id: id,
+						label: label
+					}, component)
 
 					next({
-						component: {
-							id: id,
-							label: properCase(unhyphenate(id)),
-							description: component.description,
-							props: props,
-							events: events,
-							mixins: mixins
-						}
+						component: component
 					})
 				}
 				catch (e) {
@@ -156,6 +216,19 @@
 			}
 		},
 		computed: {
+			extendedBy () {
+				return this.$root.components.filter((extending) => {
+					return extending.mixins && extending.mixins.filter((mix) => {
+						return mix.name === this.component.id
+					}).length > 0
+				})
+			},
+			usedBy () {
+				return this.$root.components.filter((using) => {
+					return using.components && 
+						keys(using.components).indexOf(pascalCase(this.component.label)) !== -1
+				})
+			},
 			demoURL () {
 				return `demo.html#!\/${ this.$route.params.id }`
 			},
@@ -226,7 +299,8 @@
 	pre {
 		background: #f9f9f9 !important;
 		border: none;
-		padding: 5px !important;
+		padding: 15px !important;
+		margin-bottom: 20px;
 	}
 	h1, h2, h3 {
 		margin: 35px 0 20px;
@@ -245,6 +319,10 @@
 		text-transform: capitalize;
 	}
 	blockquote {
+		background: #f9f9f9;
+	}
+	.panel-default {
+		border-color: #f9f9f9;
 		background: #f9f9f9;
 	}
 </style>

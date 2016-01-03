@@ -128,6 +128,7 @@
 	import { TabsNav } from 'themekit-vue'
 	import Docs from 'themekit-vue/resources/docs/dist/docs'
 	import keys from 'mout/object/keys'
+	import merge from 'mout/object/merge'
 	import hyphenate from 'mout/string/hyphenate'
 	import unhyphenate from 'mout/string/unhyphenate'
 	import properCase from 'mout/string/properCase'
@@ -196,17 +197,17 @@
 						})
 					})
 				}
-				
 				return components
 			}
 		},
 		ready () {
 			this.components = keys(Docs).map((pascalId) => {
+				let component = Docs[pascalId]
 				let id = hyphenate(pascalId)
-				return {
-					label: properCase(unhyphenate(id)),
-					id: id
-				}
+				return merge({
+					id: id,
+					label: properCase(unhyphenate(id))
+				}, component)
 			})
 		},
 		components: {
