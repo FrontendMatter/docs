@@ -126,6 +126,11 @@
 	import { SidebarCollapseItem } from 'themekit-vue'
 	import { Navbar } from 'themekit-vue'
 	import { TabsNav } from 'themekit-vue'
+	import Docs from 'themekit-vue/resources/docs/dist/docs'
+	import keys from 'mout/object/keys'
+	import hyphenate from 'mout/string/hyphenate'
+	import unhyphenate from 'mout/string/unhyphenate'
+	import properCase from 'mout/string/properCase'
 
 	export default {
 		replace: false,
@@ -196,8 +201,12 @@
 			}
 		},
 		ready () {
-			this.$http.get('components').then((response) => {
-				this.components = response.data
+			this.components = keys(Docs).map((pascalId) => {
+				let id = hyphenate(pascalId)
+				return {
+					label: properCase(unhyphenate(id)),
+					id: id
+				}
 			})
 		},
 		components: {

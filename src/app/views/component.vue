@@ -26,7 +26,7 @@
 						<template v-for="event in component.events">
 							<h4>{{ event.name }}</h4>
 							<p v-if="event.description">{{{ event.description | unindent | marked }}}</p>
-							<pre>{{ event.event }}</pre>
+							<pre><code v-highlight="event.event" lang="javascript"></code></pre>
 							<hr>
 						</template>
 					</template>
@@ -52,6 +52,12 @@
 	import { Tabs } from 'themekit-vue'
 	import { TabPane } from 'themekit-vue'
 	import marked from 'marked'
+	import Docs from 'themekit-vue/resources/docs/dist/docs'
+	import hyphenate from 'mout/string/hyphenate'
+	import unhyphenate from 'mout/string/unhyphenate'
+	import properCase from 'mout/string/properCase'
+	import pascalCase from 'mout/string/pascalCase'
+	import forOwn from 'mout/object/forOwn'
 
 	marked.setOptions({
 		highlight: function (code) {
@@ -80,23 +86,51 @@
 			return {
 				component: null,
 				componentError: null,
-				componentInfo: null,
 				tabId: null
 			}
 		},
 		route: {
 			canReuse: false,
 			data ({ to, next }) {
-				this.$http.get(`components/${ to.params.id }`).then((response) => {
-					next({
-						component: response.data
+				try {
+					let id = to.params.id
+					let propertyName = pascalCase(id)
+					let component = Docs[propertyName]
+
+					let props = []
+					forOwn(component.props, (prop, name) => {
+						props.push({
+							name: hyphenate(name),
+							description: prop.description,
+							type: prop.type.name,
+							default: prop.default,
+							required: prop.required
+						})
 					})
-				})
-				.catch((response) => {
-					next({
-						componentError: response.data
+
+					let events = []
+					forOwn(component.events, (event, name) => {
+						events.push({
+							name: name,
+							event: event.toString()
+						})
 					})
-				})
+
+					next({
+						component: {
+							id: id,
+							label: properCase(unhyphenate(id)),
+							description: component.description,
+							props: props,
+							events: events
+						}
+					})
+				}
+				catch (e) {
+					next({
+						componentError: e.message
+					})
+				}
 			}
 		},
 		computed: {
@@ -168,8 +202,9 @@
 		line-height: 1.7;
 	}
 	pre {
-		background: #f9f9f9;
+		background: #f9f9f9 !important;
 		border: none;
+		padding: 5px !important;
 	}
 	h1, h2, h3 {
 		margin: 35px 0 20px;
@@ -177,9 +212,12 @@
 	p {
 		margin-bottom: 15px;
 	}
-	code {
-		background: #f7f7f7;
+	code, pre code {
+		background: #f9f9f9 !important;
 		color: inherit;
+	}
+	pre code {
+		padding: 0 !important;
 	}
 	.component-name {
 		text-transform: capitalize;
