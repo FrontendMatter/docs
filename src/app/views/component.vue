@@ -12,12 +12,10 @@
 					<template v-if="component.requirements.length">
 						<h3>Requirements</h3>
 						<blockquote>
-							The {{ component.label }} component <strong>must be used</strong> as children of the following component(s):
-							<ul class="list-unstyled">
-								<li v-for="required in component.requirements">
-									<a v-link="{ name: 'component', params: { id: required.id } }" v-text="required.label"></a>
-								</li>
-							</ul>
+							The {{ component.label }} component <strong>must be used</strong> as a child element of
+							<template v-for="required in component.requirements">
+								<a v-link="{ name: 'component', params: { id: required.id } }" v-text="required.label"></a><span v-text="$index | separatorLast component.requirements.length"></span>
+							</template>
 						</blockquote>
 					</template>
 
@@ -84,6 +82,11 @@
 
 					<template v-if="component.props.length">
 						<h3>Properties</h3>
+						<blockquote>
+							Properties define how the component expects to receive data from its parent.
+							<small>You can learn more about <a href="http://vuejs.org/guide/components.html#Passing_Data_with_Props">Passing Data with Props on Vue.js components</a></small>
+						</blockquote>
+						<p>The {{ component.label }} component exposes the following properties:</p>
 						<template v-for="prop in component.props">
 							<div class="panel panel-default panel-body">
 								<h4>{{ prop.name }}</h4>
@@ -156,7 +159,15 @@
 	export default {
 		filters: {
 			marked: marked,
-			unindent: unindent
+			unindent: unindent,
+			separatorLast: function ($index, $length, separator, lastSeparator) {
+				if ($index === $length - 2) {
+					return lastSeparator || ' or '
+				}
+				if ($index !== $length - 1) {
+					return separator || ', '
+				}
+			}
 		},
 		data () {
 			return {
