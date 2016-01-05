@@ -102,7 +102,7 @@
 						<h3>Properties</h3>
 						<blockquote>
 							<p>Properties define how the component expects to receive data from its parent.</p>
-							<small>You can learn more about <a href="http://vuejs.org/guide/components.html#Passing_Data_with_Props">Passing Data with Props on Vue.js components</a></small>
+							<small>You can learn more about <a href="http://vuejs.org/guide/components.html#Passing_Data_with_Props">Passing Data with Props in Vue.js components</a></small>
 						</blockquote>
 						<p>The {{ component.label }} component exposes the following properties:</p>
 						<template v-for="prop in component.props">
