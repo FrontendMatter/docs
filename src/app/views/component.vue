@@ -11,7 +11,7 @@
 
 					<template v-if="component.requirements.length">
 						<h3>Requirements</h3>
-						<blockquote>
+						<blockquote class="warning">
 							The {{ component.label }} component <strong>must be used</strong> as a child element of
 							<template v-for="required in component.requirements">
 								<a v-link="{ name: 'component', params: { id: required.id } }" v-text="required.label"></a><span v-text="$index | separatorLast component.requirements.length"></span>
@@ -24,8 +24,8 @@
 					</template>
 
 					<template v-if="!component.template && !component.mixins.length">
-						<h3>Note</h3>
-						<blockquote>
+						<h3>Warning</h3>
+						<blockquote class="warning">
 							The {{ component.label }} component does not have a template.
 							<template v-if="extendedBy.length">
 								It's likely that this component is not meant to be used directly. Instead, you probably want to use one of the components extending {{ component.label }}, below.
@@ -80,10 +80,28 @@
 						</blockquote>
 					</template>
 
+					<hr>
+
+					<template v-if="component.slots.length">
+						<h3>Slots</h3>
+						<blockquote>
+							<p>A <strong>slot</strong> is a special attribute that instructs the component's parent how to distribute content.</p>
+							<small>You can learn more about <a href="http://vuejs.org/guide/components.html#Content_Distribution_with_Slots">Content Distribution with Slots in Vue.js components</a></small>
+						</blockquote>
+						<p>The {{ component.label }} component can have the following slot attribute values:</p>
+						<template v-for="slot in component.slots">
+							<div class="panel panel-default panel-body">
+								<h4>{{ slot.name }}</h4>
+								<p v-if="slot.description">{{{ slot.description | unindent | marked }}}</p>
+							</div>
+						</template>
+						<hr>
+					</template>
+
 					<template v-if="component.props.length">
 						<h3>Properties</h3>
 						<blockquote>
-							Properties define how the component expects to receive data from its parent.
+							<p>Properties define how the component expects to receive data from its parent.</p>
 							<small>You can learn more about <a href="http://vuejs.org/guide/components.html#Passing_Data_with_Props">Passing Data with Props on Vue.js components</a></small>
 						</blockquote>
 						<p>The {{ component.label }} component exposes the following properties:</p>
@@ -96,6 +114,7 @@
 								<h5 v-if="prop.required">required: <code>true</code></h5>
 							</div>
 						</template>
+						<hr>
 					</template>
 
 					<template v-if="component.events.length">
@@ -331,7 +350,7 @@
 		line-height: 1.7;
 	}
 	pre {
-		background: #f9f9f9 !important;
+		background: #fbfbfb !important;
 		border: none;
 		padding: 15px !important;
 		margin-bottom: 20px;
@@ -343,7 +362,7 @@
 		margin-bottom: 15px;
 	}
 	code, pre code {
-		background: #f9f9f9 !important;
+		background: #fbfbfb !important;
 		color: inherit;
 	}
 	pre code {
@@ -353,10 +372,21 @@
 		text-transform: capitalize;
 	}
 	blockquote {
-		background: #f9f9f9;
+		padding: 20px;
+		&.warning {
+			background: $orange-50;
+			border-color: $orange-100;
+			a {
+				color: $text-color;
+				text-decoration: underline;
+			}
+		}
 	}
 	.panel-default {
-		border-color: #f9f9f9;
-		background: #f9f9f9;
+		border-color: #fbfbfb;
+		background: #fbfbfb;
+	}
+	hr {
+		margin: 40px 0;
 	}
 </style>
