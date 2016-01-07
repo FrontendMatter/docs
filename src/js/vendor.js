@@ -6,7 +6,6 @@
 import 'bootstrap-sass/assets/stylesheets/_bootstrap'
 
 // ICONS
-import 'material-design-iconic-font/css/material-design-iconic-font'
 import 'font-awesome/css/font-awesome'
 
 // THEMEKIT
@@ -43,8 +42,10 @@ import 'modernizr/modernizr'
 // Vue library
 import Vue from 'vue'
 
-// Load ThemeKit
-import ThemeKit from 'themekit-vue'
+// Vue Resource
+import VueResource from 'vue-resource'
+Vue.use(VueResource)
 
-// Setup
+// ThemeKit
+import ThemeKit from 'themekit-vue'
 Vue.use(ThemeKit)
