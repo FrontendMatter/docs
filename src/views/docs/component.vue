@@ -1,7 +1,7 @@
 <template>
 	<tabs nav-id="tabs-navbar" :class="tabs">
 		<tab-pane active icon="fa fa-fw fa-file-text-o" label="Docs">
-			<div class="docs-container">
+			<div class="container">
 				
 				<template v-if="component">
 					<h1 class="component-name">{{ component.label }}</h1>
@@ -147,14 +147,11 @@
 <script>
 	import { Tabs } from 'themekit-vue'
 	import { TabPane } from 'themekit-vue'
+
 	import marked from 'marked'
-	import hyphenate from 'mout/string/hyphenate'
-	import unhyphenate from 'mout/string/unhyphenate'
-	import properCase from 'mout/string/properCase'
 	import pascalCase from 'mout/string/pascalCase'
 	import keys from 'mout/object/keys'
-	import forOwn from 'mout/object/forOwn'
-	import merge from 'mout/object/merge'
+	import componentFormatter from 'themekit-docs/src/lib/component-formatter'
 
 	marked.setOptions({
 		highlight: function (code) {
@@ -203,9 +200,8 @@
 						/*global Docs*/
 						if (typeof Docs !== 'undefined') {
 							clearInterval(this.tryDocsLoaded)
-							let component = this.loadComponent(id)
 							next({
-								component: component
+								component: this.loadComponent(id)
 							})
 						}
 					}, 50)
@@ -251,70 +247,8 @@
 		},
 		methods: {
 			loadComponent (id) {
-				let label = properCase(unhyphenate(id))
-				let propertyName = pascalCase(id)
 				/*global Docs*/
-				let component = Object.assign({}, Docs.Components[propertyName])
-
-				let mixins = component.mixins || []
-				mixins = mixins.filter((mix) => {
-					return typeof mix.name !== 'undefined'
-				})
-				.map((mix) => {
-					mix.label = properCase(unhyphenate(mix.name))
-					return mix
-				})
-				component.mixins = mixins
-
-				let props = []
-				forOwn(component.props, (prop, name) => {
-					props.push({
-						name: hyphenate(name),
-						description: prop.description,
-						type: prop.type.name,
-						default: prop.default,
-						required: prop.required
-					})
-				})
-				component.props = props
-
-				let events = []
-				forOwn(component.events, (event, name) => {
-					events.push({
-						name: name,
-						event: event.toString()
-					})
-				})
-				component.events = events
-
-				let components = []
-				forOwn(component.components, (component, name) => {
-					let id = hyphenate(name)
-					components.push({
-						id: id,
-						label: properCase(unhyphenate(id))
-					})
-				})
-				component.components = components
-
-				component.requirements = (component.requirements || []).map((id) => {
-					return {
-						id: id,
-						label: properCase(unhyphenate(id))
-					}
-				})
-
-				component = merge({
-					id: id,
-					label: label
-				}, component)
-
-				return component
-			},
-			maybeHasDemo () {
-				this.$http.get(this.demoURL).then((response) => {
-					alert(response.data)
-				})
+				return componentFormatter(id, Docs.Components)
 			}
 		},
 		components: {
@@ -355,52 +289,7 @@
 		width: 100%;
 		height: 100%;
 	}
-	.docs-container {
-		max-width: 800px; 
-		margin: 0 auto;
-		padding: 20px 0;
-		letter-spacing: .2px;
-		font-size: 16px;
-		line-height: 1.7;
-	}
-	pre {
-		background: #fbfbfb !important;
-		border: none;
-		padding: 15px !important;
-		margin-bottom: 20px;
-	}
-	h1, h2, h3 {
-		margin: 35px 0 20px;
-	}
-	p {
-		margin-bottom: 15px;
-	}
-	code, pre code {
-		background: #fbfbfb !important;
-		color: inherit;
-	}
-	pre code {
-		padding: 0 !important;
-	}
 	.component-name {
 		text-transform: capitalize;
-	}
-	blockquote {
-		padding: 20px;
-		&.warning {
-			background: $orange-50;
-			border-color: $orange-100;
-			a {
-				color: $text-color;
-				text-decoration: underline;
-			}
-		}
-	}
-	.panel-default {
-		border-color: #fbfbfb;
-		background: #fbfbfb;
-	}
-	hr {
-		margin: 40px 0;
 	}
 </style>

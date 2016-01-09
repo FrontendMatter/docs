@@ -17,7 +17,7 @@ router.map({
 			'/:id': {
 				name: 'component',
 				component: function (resolve) {
-					require(['../app/component'], resolve)
+					require(['../views/docs/component'], resolve)
 				}
 			}
 		}

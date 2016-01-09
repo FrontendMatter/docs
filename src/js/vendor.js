@@ -31,6 +31,9 @@ import 'themekit-vue/src/sass/elements/_button'
 import 'themekit-vue/src/sass/elements/_jumbotron'
 import 'themekit-vue/src/sass/elements/_panel'
 
+// DOCS
+import '../sass/_docs'
+
 /*
  * SCRIPTS
  */
@@ -39,12 +42,31 @@ import 'jquery'
 import 'bootstrap-sass/assets/javascripts/bootstrap'
 import 'modernizr/modernizr'
 
+// EXTERNALS
+
+// ISOTOPE
+import Isotope from 'isotope-layout'
+import Packery from 'isotope-packery'
+window.Isotope = Isotope
+window.Packery = Packery
+
+// HIGHLIGHT.JS
+import 'highlight.js/lib/highlight'
+import 'highlight.js/styles/github-gist'
+import 'highlight.js/lib/languages/xml'
+import 'highlight.js/lib/languages/javascript'
+import 'js-beautify'
+
 // Vue library
 import Vue from 'vue'
 
 // Vue Resource
 import VueResource from 'vue-resource'
 Vue.use(VueResource)
+
+// Vue Validator
+import VueValidator from 'vue-validator'
+Vue.use(VueValidator)
 
 // ThemeKit
 import ThemeKit from 'themekit-vue'
