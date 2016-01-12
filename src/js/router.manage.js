@@ -15,28 +15,21 @@ router.map({
 		}
 	},
 	'/packages/:id': {
+		name: 'package',
 		component: function (resolve) {
 			require(['../views/manage/packages/package'], resolve)
-		},
-		subRoutes: {
-			'/': {
-				name: 'package',
-				component: function (resolve) {
-					require(['../views/manage/packages/view'], resolve)
-				}
-			},
-			'/components/create': {
-				name: 'package.create.component',
-				component: function (resolve) {
-					require(['../views/manage/components/edit'], resolve)
-				}
-			},
-			'/components/edit/:componentId': {
-				name: 'package.edit.component',
-				component: function (resolve) {
-					require(['../views/manage/components/edit'], resolve)
-				}
-			}
+		}
+	},	
+	'/packages/:id/components/create': {
+		name: 'package.create.component',
+		component: function (resolve) {
+			require(['../views/manage/components/edit'], resolve)
+		}
+	},
+	'/packages/:id/components/edit/:componentId': {
+		name: 'package.edit.component',
+		component: function (resolve) {
+			require(['../views/manage/components/edit'], resolve)
 		}
 	}
 })

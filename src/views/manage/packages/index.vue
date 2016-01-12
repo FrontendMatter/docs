@@ -1,44 +1,17 @@
 <template>
 
 	<div class="page-header">
-		<button class="btn btn-success pull-right" data-toggle="modal" data-target="#create-package">Add package</button>
+		<button class="btn btn-primary pull-right" data-toggle="modal" data-target="#create-package">Add package</button>
 		<h1>Packages</h1>
 	</div>
 
+	<alert-notification></alert-notification>
+
 	<!-- Service Loading -->
-	<div class="alert alert-default" v-if="$loadingRouteData">Loading ...</div>
-
-	<!-- Service Error -->
-	<div class="alert alert-danger" v-if="serviceError">
-		<h4>Service error</h4>
-		<pre v-text="serviceError | json" class="m-b-0"></pre>
-	</div>
-
-	<!-- Create -->
-	<modal id="create-package" 
-		title="Create package" 
-		@save.tk.modal="create"
-		slide panel>
-
-		<validator name="validation" slot="body">
-			<form @submit.prevent="submit">
-				<div class="form-group" 
-					:class="{ 'has-error': ($validation.name.dirty || didSubmit) && $validation.name.invalid }">
-					<label for="package-name">Package name</label>
-					<input type="text" 
-						class="form-control" 
-						v-model="model.name" 
-						v-validate:name="{ required: { rule: true, message: 'The package name is required' } }"
-						autofocus />
-					<p class="help-block" v-for="msg in $validation.name.messages">{{ msg }}</p>
-				</div>
-			</form>
-		</validator>
-	</modal>
+	<div class="alert alert-default" v-if="serviceLoading">Loading ...</div>
 
 	<!-- Display list -->
-	<div class="alert alert-default" v-if="!serviceLoading && !packages.length">No packages to display.</div>
-	<isotope v-else>
+	<isotope v-if="packages">
 		<isotope-item class="col-md-4" v-for="package in packages">
 			<div class="panel panel-default panel-package">
 				<div class="panel-heading">
@@ -54,36 +27,54 @@
 		</isotope-item>
 	</isotope>
 
+	<!-- No packages -->
+	<div class="alert alert-default" v-if="!serviceLoading && !packages.length">
+		No packages to display.
+	</div>
+
+	<!-- Create -->
+	<modal id="create-package" 
+		title="Create package" 
+		@save.tk.modal="create"
+		slide panel>
+
+		<validator name="validation" slot="body">
+			<form @submit.prevent="submit">
+				<div class="form-group" 
+					:class="{ 'has-error': hasValidationError('validation', 'name') }">
+					<label for="package-name">Package name</label>
+					<input type="text" 
+						class="form-control" 
+						v-model="model.name" 
+						v-validate:name="{ required: { rule: true, message: 'The package name is required' } }"
+						autofocus />
+					<p class="help-block" v-for="msg in validationMessages('validation', 'name')">{{ msg }}</p>
+				</div>
+			</form>
+		</validator>
+	</modal>
+
 </template>
 
 <script>
 	import { Modal } from 'themekit-vue'
 	import { Isotope, IsotopeItem } from 'themekit-vue'
-	import PackagesController from 'themekit-docs/src/mixins/packages-controller'
+	import AlertNotification from 'themekit-docs/src/mixins/alert-notification'
+	import ServiceUtil from 'themekit-docs/src/mixins/service-util'
+	import Validation from 'themekit-docs/src/mixins/validation'
 
 	export default {
 		mixins: [
-			PackagesController
+			ServiceUtil,
+			Validation
 		],
-		route: {
-			data ({ next }) {
-				this.$once('loadedRouteData', next)
-				this.onPackageAdded((data) => {
-					this.onAdded(data)
-					this.$dispatch('loadedRouteData')
-				})
-				this.onPackageRemoved(this.onRemoved)
-				this.onPackageNone(next)
-			}
-		},
 		data () {
 			return {
 				model: {
 					name: null
 				},
 				modal: null,
-				packages: [],
-				didSubmit: false
+				packages: []
 			}
 		},
 		methods: {
@@ -92,7 +83,7 @@
 				if (this.$validation.invalid) {
 					return abort('save')
 				}
-				this.setPackage(this.model.name, this.model).then(() => {
+				this.store.setPackage(this.model.name, this.model).then(() => {
 					this.model = this.defaultModel
 					next('save')
 				})
@@ -109,16 +100,29 @@
 				this.$route.router.go({ name: 'package', params: { id: name } })
 			},
 			onAdded (data) {
-				this.packages.push(data)
+				const exists = this.packages.find((p) => p.name === data.name)
+				if (!exists) {
+					this.packages.push(data)
+				}
 			},
 			onRemoved (name) {
-				this.packages = this.packages.filter((p) => {
-					return p.name !== name
-				})
+				this.packages = this.packages.filter((p) => p.name !== name)
+			},
+			removePackage (name) {
+				if (confirm('Are you sure you want to remove this package?')) {
+					this.store.removePackage(name)
+				}
 			}
 		},
 		created () {
 			this.defaultModel = Object.assign({}, this.model)
+
+			this.store.getPackages().then((packages) => {
+				this.packages = packages
+
+				this.store.onPackageAdded(this.onAdded)
+				this.store.onPackageRemoved(this.onRemoved)
+			})
 		},
 		events: {
 			'ready.tk.modal': function (modal) {
@@ -128,7 +132,8 @@
 		components: {
 			Modal,
 			Isotope,
-			IsotopeItem
+			IsotopeItem,
+			AlertNotification
 		}
 	}
 </script>

@@ -1,116 +1,231 @@
 <template>
-	
-	<!-- Service Error -->
-	<div class="alert alert-danger" v-if="serviceError">
-		<h4>Service error</h4>
-		<pre v-text="serviceError | json" class="m-b-0"></pre>
-	</div>
+
+	<alert-notification></alert-notification>
 
 	<!-- Loading -->
-	<div class="alert alert-default" v-if="loading">Loading data ...</div>
+	<div class="alert alert-default" v-if="serviceLoading">Loading data ...</div>
+	
+	<template v-if="!serviceLoading && (!isEditView || model.name)">
 
-	<!-- Form -->
-	<template v-if="!loading">
+		<!-- Main form -->
 		<validator name="validation">
 			<form @submit.prevent="create">
+
+				<div class="page-header">
+					<div class="pull-right">
+						<button type="button" class="btn btn-link" @click="cancel">Cancel</button>
+						<button type="submit" class="btn btn-success">Save</button>
+					</div>
+					<h1>{{ component.name }} <small>Edit component</small></h1>
+					<a v-link="{ name: 'package', params: { id: $route.params.id } }">{{ $route.params.id }}</a> package
+				</div>
+
 				<div class="form-group" 
-					:class="{ 'has-error': ($validation.name.dirty || didSubmit) && $validation.name.invalid }">
+					:class="{ 'has-error': hasValidationError('validation', 'name') }">
 					<label for="name">Component name</label>
 					<input type="text" 
 						id="name"
 						class="form-control" 
 						v-model="model.name" 
 						v-validate:name="{ required: { rule: true, message: 'The component name is required' } }"
-						autofocus />
-					<p class="help-block" v-for="msg in $validation.name.messages">{{ msg }}</p>
+						:autofocus="!isEditView"  />
+					<p class="help-block" v-for="msg in validationMessages('validation', 'name')">{{ msg }}</p>
 				</div>
 				<div class="form-group" 
-					:class="{ 'has-error': ($validation.description.dirty || didSubmit) && $validation.description.invalid }">
+					:class="{ 'has-error': hasValidationError('validation', 'description') }">
 					<label for="description">Description</label>
 					<textarea id="description"
 						class="form-control" 
 						v-model="model.description" 
 						v-validate:description="{ required: { rule: true, message: 'The component description is required' } }">
 					</textarea>
-					<p class="help-block" v-for="msg in $validation.description.messages">{{ msg }}</p>
+					<p class="help-block" v-for="msg in validationMessages('validation', 'description')">{{ msg }}</p>
 				</div>
 
-				<template v-if="model.props">
-					<div class="page-header">
-						<h2>Properties</h2>
-					</div>
-					<div class="form-group" 
-						:class="{ 'has-error': ($validation.description.dirty || didSubmit) && $validation.description.invalid }"
-						v-for="(key, prop) in model.props">
-						<h3>{{ prop.name }}</h3>
-						<label for="prop-{{ key }}">Description</label>
-						<textarea id="prop-{{ key }}"
-							class="form-control" 
-							v-model="model.props[ key ].description" 
-							v-validate:description="{ required: { rule: true, message: 'The component description is required' } }">
-						</textarea>
-						<p class="help-block" v-for="msg in $validation.description.messages">{{ msg }}</p>
-						<pre v-text="model.props[ key ] | json"></pre>
-					</div>
-				</template>
+				<div class="page-header">
+					<button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#add-property">Add property</button>
+					<h2>Properties</h2>
+				</div>
 
+				<!-- Property -->
+				<template 
+					v-if="component.props" 
+					v-for="(key, prop) in model.props">
+
+					<!-- Editable property -->
+					<validator 
+						v-if="isEditable('props.' + key)"
+						:name="'prop-validation-' + key">
+						<div class="form-group form-group-prop" 
+							:class="{ 'has-error': hasValidationError('prop-validation-' + key, 'description') }">
+							<h3 id="prop-{{ key }}">{{ prop.name }}</h3>
+							<label for="prop-{{ key }}-description">Description</label>
+							<textarea id="prop-{{ key }}-description"
+								class="form-control" 
+								v-model="model.props[ key ].description" 
+								v-validate:description="{ required: { rule: true, message: 'The property description is required' } }">
+							</textarea>
+							<p class="help-block" v-for="msg in validationMessages('prop-validation-' + key, 'description')">{{ msg }}</p>
+							<p class="help-block">
+								<button type="submit" class="btn btn-default">OK</button>
+								<button class="btn btn-default" @click.stop="toggleEditable('props.' + key)">Cancel</button>
+							</p>
+							<pre v-text="component.props[ key ] | json"></pre>
+							<button class="btn btn-link" @click.prevent.stop="removeProperty(key)">Remove</button>
+						</div>
+					</validator>
+					<!-- // END Editable property -->
+					
+					<!-- Read-only property -->
+					<div v-else class="form-group form-group-prop">
+						<h3 id="prop-{{ key }}">{{ prop.name }}</h3>
+						<label>Description</label> 
+						<a href="#" @click.prevent.stop="toggleEditable('props.' + key)">Edit</a>
+						<p class="help-block">
+							<template v-if="model.props[key].description">
+								{{ model.props[key].description }}
+							</template>
+							<template v-else>
+								<span class="label label-danger">missing</span>
+								The property is missing a description. 
+								<a href="#" @click.prevent.stop="toggleEditable('props.' + key)">Add a description</a>
+							</template>
+						</p>
+						<pre v-text="component.props[ key ] | json"></pre>
+						<div>
+							<button type="submit" class="btn btn-link">Save</button>
+							<button class="btn btn-link" @click.prevent.stop="removeProperty(key)">Remove</button>
+						</div>
+					</div>
+					<!-- // END Read-only property -->
+
+				</template>
+				<!-- // END Property -->
+
+				<!-- No properties -->
+				<div v-if="!hasProps(component)" class="alert alert-default">
+					No properties.
+				</div>
+				
+				<!-- Main form controls -->
 				<div class="form-group">
-					<button type="button" class="btn btn-default" @click="cancel">Cancel</button>
-					<button type="submit" class="btn btn-primary">Save</button>
+					<button type="submit" class="btn btn-success">Save</button>
+					<button type="button" class="btn btn-link" @click="cancel">Cancel</button>
 				</div>
 			</form>
 		</validator>
-		<hr>
-		<pre v-text="model | json"></pre>
+		<!-- // END Main form -->
+
+		<!-- Add property modal -->
+		<modal id="add-property"
+			title="Add property"
+			@save.tk.modal="addProperty"
+			slide panel>
+			<validator name="add-property-validation" slot="body">
+				<form @submit.prevent="submitAddProperty">
+					<div class="form-group" 
+						:class="{ 'has-error': hasValidationError('add-property-validation', 'name') }">
+						<label for="property-name">Property name</label>
+						<input type="text" 
+							class="form-control" 
+							v-model="property.name" 
+							v-validate:name="{ required: { rule: true, message: 'The property name is required' } }"
+							autofocus />
+						<p class="help-block" v-for="msg in validationMessages('add-property-validation', 'name')">{{ msg }}</p>
+					</div>
+					<div class="form-group" 
+						:class="{ 'has-error': hasValidationError('add-property-validation', 'description') }">
+						<label for="property-description">Description</label>
+						<textarea id="property-description"
+							class="form-control" 
+							v-model="property.description" 
+							v-validate:description="{ required: { rule: true, message: 'The property description is required' } }">
+						</textarea>
+						<p class="help-block" v-for="msg in validationMessages('add-property-validation', 'description')">{{ msg }}</p>
+					</div>
+				</form>
+			</validator>
+		</modal>
+		<!-- // END Add property modal -->
+
 	</template>
+
 </template>
 
 <script>
-	import PackagesController from 'themekit-docs/src/mixins/packages-controller'
+	import AlertNotification from 'themekit-docs/src/mixins/alert-notification'
+	import ServiceUtil from 'themekit-docs/src/mixins/service-util'
+	import Validation from 'themekit-docs/src/mixins/validation'
+
+	import { Modal } from 'themekit-vue'
+	import merge from 'mout/object/merge'
+	import forOwn from 'mout/object/forOwn'
+	import set from 'mout/object/set'
+	import get from 'mout/object/get'
+	import slugify from 'mout/string/slugify'
+	import camelCase from 'mout/string/camelCase'
 	
 	export default {
 		mixins: [
-			PackagesController
+			AlertNotification,
+			ServiceUtil,
+			Validation
 		],
 		data () {
 			return {
+				// main form model
 				model: {
 					name: null,
 					description: null,
-					props: [],
-					events: [],
+					props: {},
+					events: {},
 					requirements: [],
 					demo: null,
 					packages: {}
 				},
-				didSubmit: false
+				// sync model
+				sync: null,
+
+				// editable fields
+				editable: {},
+
+				// add property form
+				property: {
+					name: null,
+					description: null
+				},
+				addPropertyModal: null
 			}
 		},
 		route: {
-			data ({ to, next }) {
-				if (!to.params.componentId) {
-					return next()
-				}
-				this.getComponent(to.params.componentId, (data) => {
-					if (data) {
-						this.model = data
-					}
-					next()
-				}, (e) => {
-					next()
-				})
-			}
+			canReuse: false
 		},
 		computed: {
-			loading () {
-				return this.serviceLoading || this.$loadingRouteData
+			component () {
+				return this.sync ? merge({}, this.sync, this.model) : this.model
+			},
+			valid () {
+				let valid = true
+				forOwn(this.component.props, (prop, key) => {
+					if (this.isEditable('props.' + key)) {
+						if (!valid) {
+							return false
+						}
+						valid = this.getValidator('prop-validation-' + key).valid
+					}
+				})
+				return this.$validation.valid && valid
+			},
+			isEditView () {
+				return this.$route.params.componentId
 			}
 		},
 		methods: {
 			create () {
 				this.didSubmit = true
-				if (this.$validation.valid) {
-					this.setComponent(this.model.name, this.model).then(() => {
+				if (this.valid) {
+					this.store.setComponent(this.model.name, this.modelSaveFormatter()).then(() => {
+						this.didSubmit = false
 						this.success('The component was saved.')
 					})
 				}
@@ -118,19 +233,139 @@
 			goToPackage () {
 				this.$route.router.go({ name: 'package', params: { id: this.$route.params.id } })
 			},
+			goToEditComponent () {
+				this.$route.router.go({ name: 'package.edit.component', params: { id: this.$route.params.id, componentId: this.model.name } })
+			},
 			cancel () {
 				this.goToPackage()
 			},
 			success (message) {
-				let root = this.$root
-				setTimeout(() => {
-					root.$broadcast('alert', { message: message })
-				}, 100)
-				this.goToPackage()
+				this.alertNotificationSuccess(message)
+				if (!this.isEditView) {
+					this.goToEditComponent()
+				}
+			},
+			toggleEditable (key) {
+				let editable = {}
+				set(editable, key, !this.isEditable(key))
+				this.editable = Object.assign({}, this.editable, editable)
+			},
+			isEditable (key) {
+				return get(this.editable, key)
+			},
+			modelSyncFormatter (sync) {
+				let model = this.model
+				forOwn(sync.props, (prop, key) => {
+					model.props[key] = {
+						name: prop.name,
+						description: null
+					}
+				})
+				return model
+			},
+			modelSaveFormatter () {
+				let model = JSON.parse(JSON.stringify(this.model))
+				forOwn(model.props, (prop, key) => {
+					if (!prop.description || prop.description.length === 0) {
+						delete model.props[key]
+					}
+				})
+				return model
+			},
+			addProperty ({ abort, next }) {
+
+				// validate
+				this.didSubmit = true
+				if (this.getValidator('add-property-validation').invalid) {
+					return abort('save')
+				}
+
+				// format property model
+				this.property.name = slugify(this.property.name)
+				let key = camelCase(this.property.name)
+				let property = {}
+				property[key] = this.property
+
+				// add property
+				this.model.props = Object.assign({}, this.model.props, property)
+				this.model = Object.assign({}, this.model)
+
+				// reset
+				this.didSubmit = false
+				next('save')
+
+				// scroll to element
+				this.$nextTick(() => {
+					this.$dispatch('scrollTo.tk.scrollable', '#prop-' + key)
+				})
+			},
+			submitAddProperty () {
+				if (this.addPropertyModal) {
+					this.addPropertyModal.save()
+				}
+			},
+			removeProperty (key) {
+				if (confirm('Are you sure you want to remove this property?')) {
+					delete this.model.props[key]
+					this.model = Object.assign({}, this.model)
+				}
+			},
+			hasProps (component) {
+				return component.props && Object.keys(component.props).length
 			}
 		},
 		created () {
-			this.model.packages[this.$route.params.id] = true
+			const packageId = this.$route.params.id
+			const componentId = this.$route.params.componentId
+
+			this.model.packages[packageId] = true
+
+			this.store.on('serviceLoading', () => {
+				$('button[type="submit"]').prop('disabled', true)
+			})
+
+			this.store.on('serviceComplete', () => {
+				setTimeout(() => {
+					$('button[type="submit"]').prop('disabled', false)
+				}, 200)
+			})
+
+			if (componentId) {
+				this.store.getComponent(componentId).then(({ component, sync }) => {
+					if (component && sync) {
+						this.model = merge(this.modelSyncFormatter(sync), component)
+					}
+					else if (sync && !component) {
+						this.model = merge(this.modelSyncFormatter(sync), { name: sync.name })
+					}
+					else if (!sync && component) {
+						this.model = component
+					}
+					if (sync) {
+						this.sync = sync
+					}
+				})
+			}
+		},
+		events: {
+			'ready.tk.modal': function (modal) {
+				this.addPropertyModal = modal
+			}
+		},
+		components: {
+			Modal,
+			AlertNotification
 		}
 	}
 </script>
+
+<style lang="sass">
+	.form-group-prop {
+		border: 1px solid $panel-default-border;
+		padding: 15px;
+		border-radius: $panel-border-radius;
+		h1, h2, h3  {
+			margin: 0 0 15px;
+		}
+	}
+</style>

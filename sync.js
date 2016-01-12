@@ -1,23 +1,25 @@
-var PackageDb = require('./lib/services/package')
-var packageService = new PackageDb('https://popping-fire-3177.firebaseio.com/sync')
 var componentFormatter = require('./lib/component-formatter')
 var Promise = require('es6-promise').Promise
+
+var store = require('./lib/services/package')
+store.setRef('https://popping-fire-3177.firebaseio.com')
 
 var packageName = process.argv[2] || 'themekit-vue'
 var packageContent = require(packageName)
 
 var forOwn = require('mout/object/forOwn')
 var queue = []
+var sync = true
 
-forOwn(packageContent, function (data, name) {
-	var component = componentFormatter(name, packageContent)
+forOwn(packageContent, function (data, key) {
+	var component = componentFormatter(key, packageContent)
 	component.packages = {}
 	component.packages[packageName] = true
-	queue.push(packageService.setComponent(component.name, component))
+	queue.push(store.setComponent(component.name, component, sync))
 })
 
 Promise.all(queue).then(function() {
-	console.log('saved to firebase: ' + packageService.components)
+	console.log('saved to firebase: ' + store.getComponentsRef(sync))
 	process.exit(1)
 })
 .catch(function (e) {

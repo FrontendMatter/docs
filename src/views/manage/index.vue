@@ -32,7 +32,7 @@
 	/* eslint no-unused-vars: 0 */
 	const DEMOS_HOST = window.DEMOS_HOST = 'http://localhost:8081/'
 	const API_HOST = window.API_HOST = 'http://localhost:3000/api'
-	const FIREBASE_REF = window.FIREBASE_REF = 'https://popping-fire-3177.firebaseio.com'
+	const FIREBASE_URL = window.FIREBASE_URL = 'https://popping-fire-3177.firebaseio.com'
 
 	export default {
 		replace: false,
