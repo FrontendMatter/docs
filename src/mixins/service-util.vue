@@ -25,7 +25,6 @@
 			}
 		},
 		created () {
-			store.setRef(window.FIREBASE_URL)
 			store.once('serviceLoading', this.onServiceLoading)
 			store.on('serviceComplete', this.onServiceComplete)
 			store.on('serviceError', this.onServiceError)

@@ -8,13 +8,19 @@ var router = new VueRouter({
 })
 
 router.map({
-	'components': {
-		name: 'components',
-		component: {
-			template: '<router-view></router-view>'
+	'/': {
+		name: 'packages',
+		component: function (resolve) {
+			require(['../views/docs/packages'], resolve)
+		}
+	},
+	'/package/:id': {
+		name: 'package',
+		component: function (resolve) {
+			require(['../views/docs/package'], resolve)
 		},
 		subRoutes: {
-			'/:id': {
+			'/components/:componentId': {
 				name: 'component',
 				component: function (resolve) {
 					require(['../views/docs/component'], resolve)
@@ -29,7 +35,7 @@ router.beforeEach(function () {
 })
 
 router.redirect({
-	'*': '/components/sidebar'
+	'*': '/'
 })
 
 export default router

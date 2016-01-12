@@ -19,10 +19,6 @@
 						</blockquote>
 					</template>
 
-					<template v-if="component.details">
-						{{{ component.details | unindent | marked }}}
-					</template>
-
 					<template v-if="!component.template && !component.mixins.length">
 						<h3>Warning</h3>
 						<blockquote class="warning">
@@ -68,7 +64,7 @@
 						</blockquote>
 					</template>
 
-					<template v-if="component.mixins.length">
+					<template v-if="component.mixins">
 						<h3>Mixins</h3>
 						<blockquote>
 							The {{ component.label }} component extends:
@@ -98,7 +94,7 @@
 						<hr>
 					</template>
 
-					<template v-if="component.props.length">
+					<template v-if="component.props">
 						<h3>Properties</h3>
 						<blockquote>
 							<p>Properties define how the component expects to receive data from its parent.</p>
@@ -108,8 +104,8 @@
 						<template v-for="prop in component.props">
 							<div class="panel panel-default panel-body">
 								<h4>{{ prop.name }}</h4>
-								<p v-if="prop.description">{{{ prop.description | unindent | marked }}}</p>
-								<h5>type: <code>{{ prop.type }}</code></h5>
+								<template v-if="prop.description">{{{ prop.description | unindent | marked }}}</template>
+								<h5 v-if="prop.type">type: <code>{{ prop.type }}</code></h5>
 								<h5 v-if="prop.default">default: <code>{{ prop.default }}</code></h5>
 								<h5 v-if="prop.required">required: <code>true</code></h5>
 							</div>
@@ -145,13 +141,10 @@
 </template>
 
 <script>
+	import ServiceUtil from 'themekit-docs/src/mixins/service-util'
 	import { Tabs } from 'themekit-vue'
 	import { TabPane } from 'themekit-vue'
-
 	import marked from 'marked'
-	import pascalCase from 'mout/string/pascalCase'
-	import keys from 'mout/object/keys'
-	import componentFormatter from 'themekit-docs/src/lib/component-formatter'
 
 	marked.setOptions({
 		highlight: function (code) {
@@ -172,6 +165,9 @@
 	}
 
 	export default {
+		mixins: [
+			ServiceUtil
+		],
 		filters: {
 			marked: marked,
 			unindent: unindent,
@@ -187,37 +183,11 @@
 		data () {
 			return {
 				component: null,
-				componentError: null,
 				tabId: null
 			}
 		},
 		route: {
-			canReuse: false,
-			data ({ to, next }) {
-				try {
-					let id = to.params.id
-					this.tryDocsLoaded = setInterval(() => {
-						/*global Docs*/
-						if (typeof Docs !== 'undefined') {
-							clearInterval(this.tryDocsLoaded)
-							next({
-								component: this.loadComponent(id)
-							})
-						}
-					}, 50)
-					setTimeout(() => {
-						clearInterval(this.tryDocsLoaded)
-						next({
-							componentError: 'Component not loaded.'
-						})
-					}, 5000)
-				}
-				catch (e) {
-					next({
-						componentError: e.message
-					})
-				}
-			}
+			canReuse: false
 		},
 		computed: {
 			extendedBy () {
@@ -228,10 +198,10 @@
 				})
 			},
 			usedBy () {
-				return this.$root.components.filter((using) => {
-					return using.components && 
-						keys(using.components).indexOf(pascalCase(this.component.label)) !== -1
-				})
+				// return this.$root.components.filter((using) => {
+				// 	return using.components && 
+				// 		Object.keys(using.components).indexOf(pascalCase(this.component.label)) !== -1
+				// })
 			},
 			demoURL () {
 				return `${ window.DEMOS_HOST }#!\/${ this.component.demo }`
@@ -240,25 +210,21 @@
 				return {
 					'tabs-demo': this.tabId === 'demo'
 				}
-			},
-			componentName () {
-				return this.$route.params.id.replace(/\-/g, ' ')
 			}
 		},
-		methods: {
-			loadComponent (id) {
-				/*global Docs*/
-				return componentFormatter(id, Docs.Components)
-			}
-		},
-		components: {
-			Tabs,
-			TabPane
+		created () {
+			this.store.getComponent(this.$route.params.componentId).then(({ merge }) => {
+				this.component = merge
+			})
 		},
 		events: {
 			'shown.tk.tab': function (tabId) {
 				this.tabId = tabId
 			}
+		},
+		components: {
+			Tabs,
+			TabPane
 		}
 	}
 </script>

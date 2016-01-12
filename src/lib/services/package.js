@@ -14,6 +14,10 @@ class PackageDb extends EventEmitter {
 	constructor (ref) {
 		super()
 
+		if (ref) {
+			this.setRef(ref)
+		}
+
 		/**
 		 * Package components two-way relationship
 		 */
@@ -450,6 +454,6 @@ class PackageDb extends EventEmitter {
 	}
 }
 
-const store = new PackageDb()
+const store = new PackageDb('https://popping-fire-3177.firebaseio.com')
 export default store
 module.exports = exports.default

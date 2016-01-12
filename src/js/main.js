@@ -1,5 +1,11 @@
+// Vue
+import Vue from 'vue'
+
 // The main application
-import App from '../views/docs/main'
+const App = Vue.extend({
+	template: '<router-view></router-view>',
+	replace: false
+})
 
 // Vue router
 import router from './router.main'

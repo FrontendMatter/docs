@@ -1,8 +1,6 @@
 var componentFormatter = require('./lib/component-formatter')
 var Promise = require('es6-promise').Promise
-
 var store = require('./lib/services/package')
-store.setRef('https://popping-fire-3177.firebaseio.com')
 
 var packageName = process.argv[2] || 'themekit-vue'
 var packageContent = require(packageName)

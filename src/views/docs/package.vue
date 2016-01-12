@@ -27,13 +27,17 @@
 			size="3"
 			effect="reveal">
 
-			<a slot="brand" href="index.html" class="sidebar-brand">ThemeKit</a>
+			<a slot="brand" href="index.html" class="sidebar-brand">ThemeKit Docs</a>
+
+			<!-- Service Loading -->
+			<p v-if="serviceLoading" class="sidebar-text">Loading ...</p>
 
 			<!-- Sidebar Menus -->
 			<sidebar-menu 
 				v-for="menu in menus" 
 				:class="menu.class" 
-				:heading="menu.heading">
+				:heading="menu.heading"
+				v-if="!serviceLoading && components.length">
 				
 				<!-- Sidebar Menu Items -->
 				<sidebar-collapse-item 
@@ -58,6 +62,7 @@
 </template>
 
 <script>
+	import ServiceUtil from 'themekit-docs/src/mixins/service-util'
 	import { LayoutTransition } from 'themekit-vue'
 	import { SidebarTransition } from 'themekit-vue'
 	import { SidebarToggleButton } from 'themekit-vue'
@@ -65,18 +70,15 @@
 	import { SidebarCollapseItem } from 'themekit-vue'
 	import { Navbar } from 'themekit-vue'
 	import { TabsNav } from 'themekit-vue'
-	import keys from 'mout/object/keys'
-	import merge from 'mout/object/merge'
-	import hyphenate from 'mout/string/hyphenate'
-	import unhyphenate from 'mout/string/unhyphenate'
-	import properCase from 'mout/string/properCase'
 
 	/* eslint no-unused-vars: 0 */
 	const DEMOS_HOST = window.DEMOS_HOST = 'http://localhost:8081/'
-	const API_HOST = window.API_HOST = 'http://localhost:3000/api'
 
 	export default {
 		replace: false,
+		mixins: [
+			ServiceUtil
+		],
 		data () {
 			return {
 				components: []
@@ -96,51 +98,24 @@
 			},
 			componentsMenu () {
 				let components = []
-				if (this.components && this.components.length) {
-					this.components.forEach((component) => {
-						components.push({
-							label: component.label,
-							route: {
-								name: 'component',
-								params: {
-									id: component.id
-								},
-								query: {
-									path: this.$route.query.path
-								}
+				this.components.forEach((component) => {
+					components.push({
+						label: component.label,
+						route: {
+							name: 'component',
+							params: {
+								id: this.$route.params.id,
+								componentId: component.name
 							}
-						})
+						}
 					})
-				}
+				})
 				return components
 			}
 		},
-		ready () {
-			var packageName = this.$route.query.path
-			var packageURL = API_HOST
-			if (packageName) {
-				packageURL += '?path=' + packageName
-			}
-
-			this.$http.get(packageURL).then((response) => {
-				var s = document.createElement('script')
-				s.type = 'text/javascript'
-				s.async = true
-				s.src = packageURL
-				var h = document.getElementsByTagName('head')[0]
-				h.appendChild(s)
-				s.addEventListener('load', () => {
-					/*global Docs*/
-					let Components = Docs.Components
-					this.components = keys(Components).map((pascalId) => {
-						let component = Components[pascalId]
-						let id = hyphenate(pascalId)
-						return merge({
-							id: id,
-							label: properCase(unhyphenate(id))
-						}, component)
-					})
-				})
+		created () {
+			this.store.getPackageComponents(this.$route.params.id).then((components) => {
+				this.components = components
 			})
 		},
 		components: {
