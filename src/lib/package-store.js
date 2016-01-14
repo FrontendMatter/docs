@@ -3,10 +3,10 @@ import merge from 'mout/object/merge'
 import { EventEmitter } from 'events'
 
 /**
- * PackageDB Firebase Service.
+ * PackageStore Firebase Service.
  * @extends {EventEmitter}
  */
-class PackageDb extends EventEmitter {
+class PackageStore extends EventEmitter {
 
 	/**
 	 * Constructor
@@ -452,8 +452,61 @@ class PackageDb extends EventEmitter {
 			this.emit('serviceError', e)
 		})
 	}
+
+	onComponentUpdate (eventType, cb, error) {
+		this.getComponentsRef().on(eventType, (snapshot) => {
+			this.syncComponentIndex(snapshot.val(), true).then((index) => {
+				cb(index)
+			})
+			.catch((e) => {
+				if (error) {
+					error(e)
+				}
+			})
+		}, (e) => {
+			if (error) {
+				error(e)
+			}
+			this.emit('serviceError', e)
+		})
+		this.getComponentsRef(true).on(eventType, (snapshot) => {
+			this.syncComponentIndex(snapshot.val()).then((index) => {
+				cb(index)
+			})
+			.catch((e) => {
+				if (error) {
+					error(e)
+				}
+			})
+		}, (e) => {
+			if (error) {
+				error(e)
+			}
+			this.emit('serviceError', e)
+		})
+	}
+
+	onComponentAdded (cb, error) {
+		this.onComponentUpdate('child_added', cb, error)
+	}
+
+	onComponentChanged (cb, error) {
+		this.onComponentUpdate('child_changed', cb, error)
+	}
+
+	onComponentRemoved (cb, error) {
+		this.getComponentsRef().on('child_removed', (snapshot) => {
+			cb(snapshot.key())
+			this.emit('serviceComplete')
+		}, (e) => {
+			if (error) {
+				error(e)
+			}
+			this.emit('serviceError', e)
+		})
+	}
 }
 
-const store = new PackageDb('https://popping-fire-3177.firebaseio.com')
+const store = new PackageStore()
 export default store
 module.exports = exports.default

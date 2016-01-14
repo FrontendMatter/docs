@@ -15,6 +15,16 @@
 			</sidebar-toggle-button>
 
 			<tabs-nav nav-id="tabs-navbar"></tabs-nav>
+
+			<div class="navbar-form navbar-left">
+				<algolia-instantsearch-dropdown
+					:algolia-app-id="appConfig.algolia.appId"
+					:algolia-api-key="appConfig.algolia.apiKey"
+					algolia-index="components"
+					:transform-hit="transformHit"
+					search-box-placeholder="Search components ...">
+				</algolia-instantsearch-dropdown>
+			</div>
 			
 		</navbar>
 		<!-- // END Navbar -->
@@ -62,7 +72,9 @@
 </template>
 
 <script>
-	import ServiceUtil from 'themekit-docs/src/mixins/service-util'
+	import appStore from 'themekit-docs/src/js/app.store'
+	import PackageStore from 'themekit-docs/src/mixins/package-store'
+	import AlgoliaInstantsearchDropdown from 'themekit-docs/src/components/algolia-instantsearch-dropdown'
 	import { LayoutTransition } from 'themekit-vue'
 	import { SidebarTransition } from 'themekit-vue'
 	import { SidebarToggleButton } from 'themekit-vue'
@@ -71,23 +83,23 @@
 	import { Navbar } from 'themekit-vue'
 	import { TabsNav } from 'themekit-vue'
 
-	/* eslint no-unused-vars: 0 */
-	const DEMOS_HOST = window.DEMOS_HOST = 'http://localhost:8081/'
-
 	export default {
-		replace: false,
 		mixins: [
-			ServiceUtil
+			PackageStore
 		],
 		data () {
 			return {
-				components: []
+				components: [],
+				appConfig: appStore.config,
+				appHelpers: appStore.helpers,
+				appState: appStore.state
 			}
 		},
 		computed: {
 			menus () { 
 				return [{
 					heading: 'Components',
+					label: 'Components',
 					class: {
 						'sm-item-bordered': true,
 						'sm-active-button-bg': true,
@@ -113,10 +125,20 @@
 				return components
 			}
 		},
+		methods: {
+			transformHit (hit) {
+				hit.route = this.appHelpers.routeToComponent(this.$route.params.id, hit.name)
+				return hit
+			}
+		},
 		created () {
 			this.store.getPackageComponents(this.$route.params.id).then((components) => {
 				this.components = components
+				this.appState.components = components
 			})
+		},
+		destroyed () {
+			this.appState.components = null
 		},
 		components: {
 			LayoutTransition,
@@ -125,7 +147,8 @@
 			SidebarMenu,
 			SidebarCollapseItem,
 			Navbar,
-			TabsNav
+			TabsNav,
+			AlgoliaInstantsearchDropdown
 		}
 	}
 </script>

@@ -14,7 +14,7 @@
 						<blockquote class="warning">
 							The {{ component.label }} component <strong>must be used</strong> as a child element of
 							<template v-for="required in component.requirements">
-								<a v-link="{ name: 'component', params: { id: required.id } }" v-text="required.label"></a><span v-text="$index | separatorLast component.requirements.length"></span>
+								<a v-link="appHelpers.routeToComponent(packageId, required.name)" v-text="required.label"></a><span v-text="$index | separatorLast component.requirements.length"></span>
 							</template>
 						</blockquote>
 					</template>
@@ -35,7 +35,7 @@
 							The {{ component.label }} component is extended by:
 							<ul class="list-unstyled">
 								<li v-for="extending in extendedBy">
-									<a v-link="{ name: 'component', params: { id: extending.id } }" v-text="extending.label"></a>
+									<a v-link="appHelpers.routeToComponent(packageId, extending.name)" v-text="extending.label"></a>
 								</li>
 							</ul>
 						</blockquote>
@@ -46,7 +46,7 @@
 							The {{ component.label }} component is used by:
 							<ul class="list-unstyled">
 								<li v-for="using in usedBy">
-									<a v-link="{ name: 'component', params: { id: using.id } }" v-text="using.label"></a>
+									<a v-link="appHelpers.routeToComponent(packageId, using.name)" v-text="using.label"></a>
 								</li>
 							</ul>
 						</blockquote>
@@ -58,7 +58,7 @@
 							The {{ component.label }} component is using:
 							<ul class="list-unstyled">
 								<li v-for="used in component.components">
-									<a v-link="{ name: 'component', params: { id: used.id } }" v-text="used.label"></a>
+									<a v-link="appHelpers.routeToComponent(packageId, used.name)" v-text="used.label"></a>
 								</li>
 							</ul>
 						</blockquote>
@@ -70,7 +70,7 @@
 							The {{ component.label }} component extends:
 							<ul class="list-unstyled">
 								<li v-for="mix in component.mixins">
-									<a v-link="{ name: 'component', params: { id: mix.name } }" v-text="mix.label"></a>
+									<a v-link="appHelpers.routeToComponent(packageId, mix.name)" v-text="mix.label"></a>
 								</li>
 							</ul>
 						</blockquote>
@@ -135,16 +135,18 @@
 			</div>
 		</tab-pane>
 		<tab-pane id="demo" label="Demo" v-if="component.demo">
-			<iframe :src="demoURL" frameborder="0"></iframe>
+			<iframe :src="component.demo" frameborder="0"></iframe>
 		</tab-pane>
 	</tabs>
 </template>
 
 <script>
-	import ServiceUtil from 'themekit-docs/src/mixins/service-util'
+	import appStore from 'themekit-docs/src/js/app.store'
+	import PackageStore from 'themekit-docs/src/mixins/package-store'
 	import { Tabs } from 'themekit-vue'
 	import { TabPane } from 'themekit-vue'
 	import marked from 'marked'
+	import pascalCase from 'mout/string/pascalCase'
 
 	marked.setOptions({
 		highlight: function (code) {
@@ -166,7 +168,7 @@
 
 	export default {
 		mixins: [
-			ServiceUtil
+			PackageStore
 		],
 		filters: {
 			marked: marked,
@@ -183,28 +185,40 @@
 		data () {
 			return {
 				component: null,
-				tabId: null
+				tabId: null,
+				appState: appStore.state,
+				appHelpers: appStore.helpers
 			}
 		},
 		route: {
 			canReuse: false
 		},
 		computed: {
+			componentId () {
+				return this.$route.params.componentId
+			},
+			packageId () {
+				return this.$route.params.id
+			},
+			components () {
+				return this.appState.components
+			},
 			extendedBy () {
-				return this.$root.components.filter((extending) => {
-					return extending.mixins && extending.mixins.filter((mix) => {
-						return mix.name === this.component.id
-					}).length > 0
-				})
+				if (this.components) {
+					return this.components.filter((extending) => {
+						return extending.mixins && extending.mixins.filter((mix) => {
+							return mix.name === this.component.name
+						}).length > 0
+					})
+				}
 			},
 			usedBy () {
-				// return this.$root.components.filter((using) => {
-				// 	return using.components && 
-				// 		Object.keys(using.components).indexOf(pascalCase(this.component.label)) !== -1
-				// })
-			},
-			demoURL () {
-				return `${ window.DEMOS_HOST }#!\/${ this.component.demo }`
+				if (this.components) {
+					return this.components.filter((using) => {
+						return using.components && 
+							Object.keys(using.components).indexOf(pascalCase(this.component.label)) !== -1
+					})
+				}
 			},
 			tabs () {
 				return {
@@ -213,7 +227,7 @@
 			}
 		},
 		created () {
-			this.store.getComponent(this.$route.params.componentId).then(({ merge }) => {
+			this.store.getComponent(this.componentId).then(({ merge }) => {
 				this.component = merge
 			})
 		},

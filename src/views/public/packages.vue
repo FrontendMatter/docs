@@ -11,6 +11,15 @@
 					<a v-link="{ path: '/' }">Packages</a>
 				</li>
 			</ul>
+			<div class="navbar-form navbar-left">
+				<algolia-instantsearch-dropdown
+					:algolia-app-id="appConfig.algolia.appId"
+					:algolia-api-key="appConfig.algolia.apiKey"
+					algolia-index="components"
+					:transform-hit="transformHit"
+					search-box-placeholder="Search components ...">
+				</algolia-instantsearch-dropdown>
+			</div>
 		</navbar>
 		<!-- // END Navbar -->
 
@@ -20,7 +29,7 @@
 			<!-- Display list -->
 			<isotope v-if="packages">
 				<isotope-item class="col-md-4" v-for="package in packages">
-					<div class="panel panel-default panel-package" @click="routePackage(package.name)">
+					<div class="panel panel-default panel-package" @click="$route.router.go(appHelpers.routeToPackage(package.name))">
 						<div class="panel-heading">
 							<h4 class="panel-title">
 								{{ package.name }}
@@ -47,23 +56,28 @@
 </template>
 
 <script>
-	import ServiceUtil from 'themekit-docs/src/mixins/service-util'
+	import appStore from 'themekit-docs/src/js/app.store'
+	import PackageStore from 'themekit-docs/src/mixins/package-store'
+	import AlgoliaInstantsearchDropdown from 'themekit-docs/src/components/algolia-instantsearch-dropdown'
 	import { Layout } from 'themekit-vue'
 	import { Navbar } from 'themekit-vue'
 	import { Isotope, IsotopeItem } from 'themekit-vue'
 
 	export default {
 		mixins: [
-			ServiceUtil
+			PackageStore
 		],
 		data () {
 			return {
-				packages: []
+				packages: [],
+				appConfig: appStore.config,
+				appHelpers: appStore.helpers
 			}
 		},
 		methods: {
-			routePackage (name) {
-				this.$route.router.go({ name: 'package', params: { id: name } })
+			transformHit (hit) {
+				hit.route = this.appHelpers.routeToComponent(Object.keys(hit.packages)[0], hit.name)
+				return hit
 			}
 		},
 		created () {
@@ -75,7 +89,8 @@
 			Layout,
 			Navbar,
 			Isotope,
-			IsotopeItem
+			IsotopeItem,
+			AlgoliaInstantsearchDropdown
 		}
 	}	
 </script>

@@ -11,19 +11,19 @@ router.map({
 	'/': {
 		name: 'packages',
 		component: function (resolve) {
-			require(['../views/docs/packages'], resolve)
+			require(['../views/public/packages'], resolve)
 		}
 	},
 	'/package/:id': {
 		name: 'package',
 		component: function (resolve) {
-			require(['../views/docs/package'], resolve)
+			require(['../views/public/package'], resolve)
 		},
 		subRoutes: {
 			'/components/:componentId': {
 				name: 'component',
 				component: function (resolve) {
-					require(['../views/docs/component'], resolve)
+					require(['../views/public/component'], resolve)
 				}
 			}
 		}

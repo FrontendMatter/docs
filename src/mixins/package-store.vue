@@ -1,5 +1,6 @@
 <script>
-	import store from 'themekit-docs/src/lib/services/package'
+	import store from 'themekit-docs/src/lib/package-store'
+	import appStore from 'themekit-docs/src/js/app.store'
 	import AlertNotification from 'themekit-docs/src/mixins/alert-notification'
 
 	export default {
@@ -9,7 +10,8 @@
 		data () {
 			return {
 				serviceLoading: false,
-				serviceCompleteDebounce: null
+				serviceCompleteDebounce: null,
+				appConfig: appStore.config
 			}
 		},
 		methods: {
@@ -25,6 +27,7 @@
 			}
 		},
 		created () {
+			store.setRef(this.appConfig.packageStoreFirebaseRef)
 			store.once('serviceLoading', this.onServiceLoading)
 			store.on('serviceComplete', this.onServiceComplete)
 			store.on('serviceError', this.onServiceError)

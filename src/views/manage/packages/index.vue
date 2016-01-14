@@ -60,12 +60,12 @@
 	import { Modal } from 'themekit-vue'
 	import { Isotope, IsotopeItem } from 'themekit-vue'
 	import AlertNotification from 'themekit-docs/src/mixins/alert-notification'
-	import ServiceUtil from 'themekit-docs/src/mixins/service-util'
+	import PackageStore from 'themekit-docs/src/mixins/package-store'
 	import Validation from 'themekit-docs/src/mixins/validation'
 
 	export default {
 		mixins: [
-			ServiceUtil,
+			PackageStore,
 			Validation
 		],
 		data () {

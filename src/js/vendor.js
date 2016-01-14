@@ -60,10 +60,6 @@ import 'js-beautify'
 // Vue library
 import Vue from 'vue'
 
-// Vue Resource
-import VueResource from 'vue-resource'
-Vue.use(VueResource)
-
 // Vue Validator
 import VueValidator from 'vue-validator'
 Vue.use(VueValidator)

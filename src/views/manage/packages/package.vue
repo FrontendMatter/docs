@@ -53,12 +53,12 @@
 <script>
 	import { Isotope, IsotopeItem } from 'themekit-vue'
 	import AlertNotification from 'themekit-docs/src/mixins/alert-notification'
-	import ServiceUtil from 'themekit-docs/src/mixins/service-util'
+	import PackageStore from 'themekit-docs/src/mixins/package-store'
 	import forOwn from 'mout/object/forOwn'
 
 	export default {
 		mixins: [
-			ServiceUtil
+			PackageStore
 		],
 		data () {
 			return {

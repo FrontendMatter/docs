@@ -154,7 +154,7 @@
 
 <script>
 	import AlertNotification from 'themekit-docs/src/mixins/alert-notification'
-	import ServiceUtil from 'themekit-docs/src/mixins/service-util'
+	import PackageStore from 'themekit-docs/src/mixins/package-store'
 	import Validation from 'themekit-docs/src/mixins/validation'
 
 	import { Modal } from 'themekit-vue'
@@ -168,7 +168,7 @@
 	export default {
 		mixins: [
 			AlertNotification,
-			ServiceUtil,
+			PackageStore,
 			Validation
 		],
 		data () {
