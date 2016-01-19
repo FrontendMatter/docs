@@ -11,6 +11,15 @@
 					<a v-link="{ name: 'packages' }">Packages</a>
 				</li>
 			</ul>
+			<div class="navbar-form navbar-left">
+				<algolia-instantsearch-dropdown
+					:algolia-app-id="appConfig.algolia.appId"
+					:algolia-api-key="appConfig.algolia.apiKey"
+					algolia-index="components"
+					:transform-hit="transformHit"
+					search-box-placeholder="Search components ...">
+				</algolia-instantsearch-dropdown>
+			</div>
 		</navbar>
 		<!-- // END Navbar -->
 
@@ -26,14 +35,30 @@
 </template>
 
 <script>
+	import appStore from 'themekit-docs/src/js/app.store'
+	import AlgoliaInstantsearchDropdown from 'themekit-docs/src/components/algolia-instantsearch-dropdown'
 	import { Layout } from 'themekit-vue'
 	import { Navbar } from 'themekit-vue'
 
 	export default {
 		replace: false,
+		data () {
+			return {
+				packages: [],
+				appConfig: appStore.config,
+				appHelpers: appStore.helpers
+			}
+		},
+		methods: {
+			transformHit (hit) {
+				hit.route = this.appHelpers.routeToEditComponent(Object.keys(hit.packages)[0], hit.name)
+				return hit
+			}
+		},
 		components: {
 			Layout,
-			Navbar
+			Navbar,
+			AlgoliaInstantsearchDropdown
 		}
 	}
 </script>

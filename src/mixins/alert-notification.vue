@@ -28,6 +28,7 @@
 		computed: {
 			alertNotificationClass () {
 				return {
+					'alert-notification': true,
 					'alert-success': this.alertNotificationModel.type === 'success',
 					'alert-danger': this.alertNotificationModel.type === 'error',
 					'alert-warning': this.alertNotificationModel.type === 'warning',

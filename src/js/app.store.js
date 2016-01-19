@@ -27,6 +27,15 @@ export default {
 					componentId
 				}
 			}
+		},
+		routeToEditComponent (packageId, componentId) {
+			return {
+				name: 'package.edit.component',
+				params: {
+					id: packageId,
+					componentId
+				}
+			}
 		}
 	}
 }

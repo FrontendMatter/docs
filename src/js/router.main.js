@@ -11,7 +11,7 @@ router.map({
 	'/': {
 		name: 'packages',
 		component: function (resolve) {
-			require(['../views/public/packages'], resolve)
+			require(['../views/public/index'], resolve)
 		}
 	},
 	'/package/:id': {
