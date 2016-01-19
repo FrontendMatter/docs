@@ -51,7 +51,7 @@
     "style-import-loader": "^0.2.0",
     "style-loader": "^0.13.0",
     "themekit-vue": "bitbucket:lazabogdan/themekit-vue",
-    "themekit-webpack-config": "^1.0.0",
+    "themekit-webpack-config": "^1.0.1",
     "url-loader": "^0.5.7",
     "vue": "^1.0.15",
     "vue-hot-reload-api": "^1.2.2",
@@ -59,7 +59,7 @@
     "vue-loader": "^8.0.2",
     "vue-router": "^0.7.8",
     "vue-style-loader": "^1.0.0",
-    "vue-validator": "^2.0.0-alpha.15",
+    "vue-validator": "^2.0.0-alpha.9",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
   },
