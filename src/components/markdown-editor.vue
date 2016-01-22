@@ -226,9 +226,9 @@
 			font-weight: bold;
 			color: #000;
 			text-shadow: 0 1px 0 #fff;
-			font-size: 20px;
-			right: 10px;
-			top: 10px;
+			font-size: 18px;
+			right: 5px;
+			top: 5px;
 			position: absolute;
 			z-index: 1;
 			line-height: 20px;
