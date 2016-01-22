@@ -7,25 +7,26 @@
 		},
 		methods: {
 			getValidator (name) {
-				return this['$' + name]
+				name = name || '$validation'
+				return this[name]
 			},
-			getValidatorField (validatorName, fieldName) {
+			getValidatorField (fieldName, validatorName) {
 				let validator = this.getValidator(validatorName)
 				if (!validator) {
 					return null
 				}
 				return validator[fieldName] || null
 			},
-			hasValidationError (validatorName, fieldName) {
-				let validatorField = this.getValidatorField(validatorName, fieldName)
+			hasValidationError (fieldName, validatorName) {
+				let validatorField = this.getValidatorField(fieldName, validatorName)
 				if (validatorField) {
 					return (validatorField.dirty || this.didSubmit) && 
 						validatorField.invalid
 				}
 				return null
 			},
-			validationMessages (validatorName, fieldName) {
-				let validatorField = this.getValidatorField(validatorName, fieldName)
+			validationMessages (fieldName, validatorName) {
+				let validatorField = this.getValidatorField(fieldName, validatorName)
 				if (validatorField) {
 					return validatorField ? validatorField.messages : null	
 				}

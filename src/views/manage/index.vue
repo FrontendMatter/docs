@@ -1,16 +1,21 @@
 <template>
 	
 	<!-- Layout -->
-	<layout>
+	<layout-transition>
 
 		<!-- Navbar -->
-		<navbar slot="navbar" fixed="top">
-			<a href="" class="navbar-brand" slot="brand">Manage Docs</a>
-			<ul class="nav navbar-nav">
-				<li :class="{ active: $route.name === 'packages' }">
-					<a v-link="{ name: 'packages' }">Packages</a>
-				</li>
-			</ul>
+		<navbar slot="navbar-content" fixed="top">
+
+			<a v-if="!isPackageView" v-link="appHelpers.routeToPackages()" class="navbar-brand" slot="brand">Manage Docs</a>
+			
+			<!-- Sidebar Toggle Button -->
+			<sidebar-toggle-button v-if="isPackageView"
+				slot="sidebar-toggle-button"
+				class="toggle pull-left"
+				sidebar-id="sidebar"
+				icon="fa fa-bars">
+			</sidebar-toggle-button>
+
 			<div class="navbar-form navbar-left">
 				<algolia-instantsearch-dropdown
 					:algolia-app-id="appConfig.algolia.appId"
@@ -23,13 +28,37 @@
 		</navbar>
 		<!-- // END Navbar -->
 
+		<sidebar-transition 
+			:show="isPackageView"
+			position="left"
+			size="3" 
+			slot="sidebar" 
+			effect="reveal">
+
+			<a v-link="appHelpers.routeToPackages()" class="sidebar-brand" slot="brand"><i class="fa fa-fw fa-chevron-left"></i> Packages</a>
+
+			<!-- Package menu -->
+			<template v-if="packageId">
+				<div class="sidebar-block bg-white">
+					<h4 class="sidebar-category">{{ packageId }}</h4>
+					<a v-link="appHelpers.routeToEditPackage(packageId)">Edit package</a>
+				</div>
+				<sidebar-menu :class="sidebarMenuClass" heading="Package navigation">
+					<sidebar-collapse-item :model="{ label: 'Components', route: appHelpers.routeToPackageComponents(packageId) }"></sidebar-collapse-item>
+					<sidebar-collapse-item :model="{ label: 'Pages', route: appHelpers.routeToPackagePages(packageId) }"></sidebar-collapse-item>
+				</sidebar-menu>
+			</template>
+			<!-- // END Package menu -->
+
+		</sidebar-transition>
+
 		<!-- Content -->
-		<div class="container">
+		<div class="container-fluid docs-container">
 			<router-view></router-view>
 		</div>
 		<!-- // END Content -->
 
-	</layout>
+	</layout-transition>
 	<!-- // END layout -->
 
 </template>
@@ -37,8 +66,9 @@
 <script>
 	import appStore from 'themekit-docs/src/js/app.store'
 	import AlgoliaInstantsearchDropdown from 'themekit-docs/src/components/algolia-instantsearch-dropdown'
-	import { Layout } from 'themekit-vue'
-	import { Navbar } from 'themekit-vue'
+	import { LayoutTransition, SidebarTransition } from 'themekit-vue'
+	import { SidebarMenu, SidebarCollapseItem } from 'themekit-vue'
+	import { Navbar, SidebarToggleButton } from 'themekit-vue'
 
 	export default {
 		replace: false,
@@ -49,15 +79,34 @@
 				appHelpers: appStore.helpers
 			}
 		},
+		computed: {
+			packageId () {
+				return this.$route.params.id
+			},
+			sidebarMenuClass () {
+				return {
+					'sm-item-bordered': true,
+					'sm-active-button-bg': true,
+					'sm-condensed': true
+				}
+			},
+			isPackageView () {
+				return this.packageId !== undefined
+			}
+		},
 		methods: {
 			transformHit (hit) {
-				hit.route = this.appHelpers.routeToEditComponent(Object.keys(hit.packages)[0], hit.name)
+				hit.route = this.appHelpers.routeToEditComponent(hit.packageId, hit.name)
 				return hit
 			}
 		},
 		components: {
-			Layout,
+			LayoutTransition,
+			SidebarTransition,
+			SidebarMenu,
+			SidebarCollapseItem,
 			Navbar,
+			SidebarToggleButton,
 			AlgoliaInstantsearchDropdown
 		}
 	}

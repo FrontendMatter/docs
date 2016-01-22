@@ -1,16 +1,24 @@
 <template>
-
+	
 	<!-- Layout -->
-	<layout>
+	<layout-transition>
 
 		<!-- Navbar -->
-		<navbar slot="navbar" fixed="top">
-			<a href="#" class="navbar-brand" slot="brand">ThemeKit Docs</a>
-			<ul class="nav navbar-nav">
-				<li :class="{ active: $route.name === 'packages' }">
-					<a v-link="{ path: '/' }">Packages</a>
-				</li>
-			</ul>
+		<navbar slot="navbar-content" fixed="top" in-content>
+
+			<a v-if="!isPackageView" v-link="appHelpers.routeToPackages()" slot="brand" class="navbar-brand">ThemeKit Docs</a>
+			
+			<!-- Sidebar Toggle Button -->
+			<sidebar-toggle-button
+				v-if="isPackageView"
+				slot="sidebar-toggle-button"
+				class="toggle pull-left"
+				sidebar-id="sidebar"
+				icon="fa fa-bars">
+			</sidebar-toggle-button>
+
+			<tabs-nav nav-id="tabs-navbar"></tabs-nav>
+
 			<div class="navbar-form navbar-left">
 				<algolia-instantsearch-dropdown
 					:algolia-app-id="appConfig.algolia.appId"
@@ -20,83 +28,168 @@
 					search-box-placeholder="Search components ...">
 				</algolia-instantsearch-dropdown>
 			</div>
+			
 		</navbar>
 		<!-- // END Navbar -->
 
+		<!-- Sidebar -->
+		<sidebar-transition 
+			:show="isPackageView"
+			slot="sidebar"
+			position="left"
+			sidebar-id="sidebar"
+			size="3"
+			effect="reveal">
+
+			<template v-if="isPackageView">
+
+				<a v-link="appHelpers.routeToPackages()" slot="brand" class="sidebar-brand"><i class="fa fa-fw fa-chevron-left"></i> Packages</a>
+
+				<div class="sidebar-block bg-white">
+					<h4 class="sidebar-category">{{ packageId }}</h4>
+					<a v-link="appHelpers.routeToPackage(packageId)">Package Overview</a>
+				</div>
+
+				<!-- Service Loading -->
+				<p v-if="!components.length && serviceLoading" class="sidebar-text">Loading ...</p>
+
+				<!-- Sidebar Menus -->
+				<sidebar-menu 
+					v-for="menu in menus" 
+					:class="menu.class" 
+					:heading="menu.heading"
+					v-if="menu.children.length">
+					
+					<!-- Sidebar Menu Items -->
+					<sidebar-collapse-item 
+						v-for="item in menu.children" 
+						:model="item">
+					</sidebar-collapse-item>
+					<!-- // END Sidebar Menu Items -->
+
+				</sidebar-menu>
+				<!-- // END Sidebar Menus -->
+
+			</template>
+
+		</sidebar-transition>
+		<!-- // END Sidebar -->
+
 		<!-- Content -->
-		<div class="container">
-			
-			<!-- Display list -->
-			<isotope v-if="packages">
-				<isotope-item class="col-md-4" v-for="package in packages">
-					<div class="panel panel-default panel-package" @click="$route.router.go(appHelpers.routeToPackage(package.name))">
-						<div class="panel-heading">
-							<h4 class="panel-title">
-								{{ package.name }}
-							</h4>
-						</div>
-						<div class="panel-body text-center">
-							<strong>{{ package.components.length }}</strong> components
-						</div>
-					</div>
-				</isotope-item>
-			</isotope>
-
-			<!-- No packages -->
-			<div class="alert alert-default" v-if="!serviceLoading && !packages.length">
-				No packages to display.
-			</div>
-
-		</div>
+		<router-view></router-view>
 		<!-- // END Content -->
 
-	</layout>
-	<!-- // END Layout -->
+	</layout-transition>
+	<!-- // END layout -->
 
 </template>
 
 <script>
 	import appStore from 'themekit-docs/src/js/app.store'
-	import PackageStore from 'themekit-docs/src/mixins/package-store'
+	import Store from 'themekit-docs/src/mixins/store'
 	import AlgoliaInstantsearchDropdown from 'themekit-docs/src/components/algolia-instantsearch-dropdown'
-	import { Layout } from 'themekit-vue'
+	import { LayoutTransition } from 'themekit-vue'
+	import { SidebarTransition } from 'themekit-vue'
+	import { SidebarToggleButton } from 'themekit-vue'
+	import { SidebarMenu } from 'themekit-vue'
+	import { SidebarCollapseItem } from 'themekit-vue'
 	import { Navbar } from 'themekit-vue'
-	import { Isotope, IsotopeItem } from 'themekit-vue'
+	import { TabsNav } from 'themekit-vue'
 
 	export default {
+		replace: false,
 		mixins: [
-			PackageStore
+			Store
 		],
 		data () {
 			return {
-				packages: [],
+				components: [],
+				pages: [],
 				appConfig: appStore.config,
-				appHelpers: appStore.helpers
+				appHelpers: appStore.helpers,
+				appState: appStore.state
+			}
+		},
+		route: {
+			canReuse: false
+		},
+		computed: {
+			isPackageView () {
+				return this.packageId !== undefined
+			},
+			packageId () {
+				return this.$route.params.id
+			},
+			menus () { 
+				return [{
+					heading: 'Pages',
+					class: {
+						'sm-item-bordered': true,
+						'sm-active-button-bg': true,
+						'sm-condensed': true
+					},
+					children: this.pages.map((page) => {
+						return {
+							label: page.title,
+							route: this.appHelpers.routeToPage(page.packageId, page.slug, page.pageId)
+						}
+					})
+				}, {
+					heading: 'Components',
+					class: {
+						'sm-item-bordered': true,
+						'sm-active-button-bg': true,
+						'sm-condensed': true
+					},
+					children: this.components.map((component) => {
+						return {
+							label: component.label,
+							route: this.appHelpers.routeToComponent(component.packageId, component.name)
+						}
+					})
+				}]
 			}
 		},
 		methods: {
 			transformHit (hit) {
-				hit.route = this.appHelpers.routeToComponent(Object.keys(hit.packages)[0], hit.name)
+				hit.route = this.appHelpers.routeToComponent(hit.packageId, hit.name)
 				return hit
+			},
+			loadPackageSidebar () {
+				this.store.getPackageComponents(this.packageId).then((components) => {
+					this.components = components.map(({ merge }) => merge)
+				})
+				this.store.getPages(this.packageId).then((pages) => {
+					this.pages = pages
+				})
 			}
 		},
 		created () {
-			this.store.getPackages().then((packages) => {
-				this.packages = packages
-			})
+			if (this.isPackageView) {
+				this.loadPackageSidebar()
+			}
+		},
+		watch: {
+			packageId (value) {
+				this.components = []
+				this.pages = []
+				if (value) {
+					this.loadPackageSidebar()
+				}
+			},
+			components (value) {
+				this.appState.components = value
+			}
 		},
 		components: {
-			Layout,
+			LayoutTransition,
+			SidebarTransition,
+			SidebarToggleButton,
+			SidebarMenu,
+			SidebarCollapseItem,
 			Navbar,
-			Isotope,
-			IsotopeItem,
+			TabsNav,
 			AlgoliaInstantsearchDropdown
 		}
-	}	
-</script>
-
-<style lang="sass">
-	.panel-package {
-		cursor: pointer;
 	}
-</style>
+</script>

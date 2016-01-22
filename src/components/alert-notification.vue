@@ -1,18 +1,26 @@
 <template>
-	<div class="alert" :class="alertNotificationClass" v-if="alertNotificationModel">
-		<button class="close" data-dismiss="alert">&times;</button>
-		<template v-if="alertNotificationModel.type === 'error'">
-			<h4>Error</h4>
-			<pre v-text="alertNotificationModel.message | json" class="m-b-0"></pre>
-		</template>
-		<template v-else>
-			{{ alertNotificationModel.message }}
-		</template>
+	<div class="alert" :class="alertNotificationClass" v-if="alertNotificationModel && !fixed">
+		<partial name="alert"></partial>
+	</div>
+	<div class="alert" :class="alertNotificationClass" v-if="alertNotificationModel && fixed" v-transfer-dom>
+		<partial name="alert"></partial>
 	</div>
 </template>
 
 <script>
 	export default {
+		partials: {
+			alert: `
+				<button class="close" data-dismiss="alert">&times;</button>
+				<template v-if="alertNotificationModel.type === 'error'">
+					<h4>Error</h4>
+					<pre v-text="alertNotificationModel.message | json" class="m-b-0"></pre>
+				</template>
+				<template v-else>
+					{{ alertNotificationModel.message }}
+				</template>
+			`
+		},
 		data () {
 			return {
 				alertNotificationModel: null,
@@ -23,6 +31,9 @@
 			timeout: {
 				type: Number,
 				default: 5000
+			},
+			fixed: {
+				type: Boolean
 			}
 		},
 		computed: {
@@ -33,7 +44,8 @@
 					'alert-danger': this.alertNotificationModel.type === 'error',
 					'alert-warning': this.alertNotificationModel.type === 'warning',
 					'alert-info': this.alertNotificationModel.type === 'info',
-					'alert-default': !this.alertNotificationModel.type
+					'alert-default': !this.alertNotificationModel.type,
+					'alert-notification-fixed': this.fixed
 				}
 			}
 		},
@@ -71,3 +83,15 @@
 		}
 	}
 </script>
+
+<style lang="sass">
+	@media (min-width: $screen-xs) {
+		.alert-notification-fixed {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			z-index: 1030;
+			min-width: 250px;
+		}
+	}
+</style>

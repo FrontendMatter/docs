@@ -22,34 +22,65 @@ export default (id, data) => {
 	let label = properCase(unhyphenate(id))
 	let propertyName = pascalCase(id)
 	let component = Object.assign({}, data[propertyName])
+	let input = {}
 
-	let toStrings = ['created', 'ready', 'destroy', 'beforeDestroy', 'data']
-	toStrings.forEach((stringify) => {
-		if (component[stringify]) {
-			component[stringify] = funcToString(component[stringify])
+	const extract = [
+		'created', 
+		'beforeCompile', 
+		'compiled', 
+		'ready', 
+		'beforeDestroy', 
+		'destroyed', 
+		'data',
+		'computed',
+		'methods',
+		'watch',
+		'mixins',
+		'props',
+		'events',
+		'components'
+	]
+
+	let toStrings = [
+		'created', 
+		'beforeCompile', 
+		'compiled', 
+		'ready', 
+		'beforeDestroy', 
+		'destroyed', 
+		'data'
+	]
+
+	let toStringFor = [
+		'computed',
+		'methods',
+		'watch'
+	]
+
+	extract.forEach((property) => {
+		if (component[property]) {
+			let obj = {}
+			obj[property] = component[property]
+			input = Object.assign({}, input, obj)
 		}
 	})
 
-	if (component.methods) {
-		forOwn(component.methods, (method, name, obj) => {
-			obj[name] = funcToString(method)
-		})
-	}
+	toStrings.forEach((stringify) => {
+		if (input[stringify]) {
+			input[stringify] = funcToString(input[stringify])
+		}
+	})
 
-	if (component.computed) {
-		forOwn(component.computed, (computed, name, obj) => {
-			obj[name] = funcToString(computed)
-		})
-	}
+	toStringFor.forEach((property) => {
+		if (input[property]) {
+			forOwn(input[property], (value, name, obj) => {
+				obj[name] = funcToString(value)
+			})
+		}
+	})
 
-	if (component.watch) {
-		forOwn(component.watch, (watch, name, obj) => {
-			obj[name] = funcToString(watch)
-		})
-	}
-
-	if (component.mixins) {
-		component.mixins = component.mixins.filter((mix) => {
+	if (input.mixins) {
+		input.mixins = input.mixins.filter((mix) => {
 			return typeof mix.name !== 'undefined'
 		})
 		.map((mix) => {
@@ -60,17 +91,17 @@ export default (id, data) => {
 		})
 	}
 
-	forOwn(component.props, (prop, name, obj) => {
+	forOwn(input.props, (prop, name, obj) => {
 		obj[name] = {
 			name: hyphenate(name),
 			description: prop.description || null,
-			type: prop.type.name,
+			type: prop.type ? prop.type.name : null,
 			default: funcToString(prop.default) || null,
 			required: prop.required || null
 		}
 	})
 
-	forOwn(component.events, (event, name, obj) => {
+	forOwn(input.events, (event, name, obj) => {
 		obj[slug(name)] = {
 			name: name,
 			event: event.toString()
@@ -78,28 +109,19 @@ export default (id, data) => {
 		delete obj[name]
 	})
 
-	if (component.components) {
+	if (input.components) {
 		let components = []
-		forOwn(component.components, (component, name) => {
+		forOwn(input.components, (component, name) => {
 			let id = hyphenate(name)
 			components.push({
 				id: id,
 				label: properCase(unhyphenate(id))
 			})
 		})
-		component.components = components
+		input.components = components
 	}
 
-	if (component.requirements) {
-		component.requirements = component.requirements.map((id) => {
-			return {
-				name: id,
-				label: properCase(unhyphenate(id))
-			}
-		})
-	}
-
-	return merge(component, {
+	return merge(input, {
 		name: id,
 		label: label
 	})

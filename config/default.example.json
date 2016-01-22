@@ -4,5 +4,5 @@
 		"apiKey": "<ALGOLIA API KEY (READ PERMISSIONS)>",
 		"writeApiKey": "<ALGOLIA API KEY (WRITE PERMISSIONS)>"
 	},
-	"packageStoreFirebaseRef": "https://<FIREBASE APP>.firebaseio.com"
+	"storeFirebaseRef": "https://<FIREBASE APP>.firebaseio.com"
 }

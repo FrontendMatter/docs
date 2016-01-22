@@ -1,8 +1,8 @@
-var componentFormatter = require('./lib/component-formatter')
+var componentImporter = require('./lib/component-importer')
 var Promise = require('es6-promise').Promise
-var store = require('./lib/package-store')
+var store = require('./lib/store')
 var config = require('config')
-store.setRef(config.get('packageStoreFirebaseRef'))
+store.setRef(config.get('storeFirebaseRef'))
 
 var packageName = process.argv[2] || 'themekit-vue'
 var packageContent = require(packageName)
@@ -12,9 +12,8 @@ var queue = []
 var sync = true
 
 forOwn(packageContent, function (data, key) {
-	var component = componentFormatter(key, packageContent)
-	component.packages = {}
-	component.packages[packageName] = true
+	var component = componentImporter(key, packageContent)
+	component.packageId = packageName
 	queue.push(store.setComponent(component.name, component, sync))
 })
 

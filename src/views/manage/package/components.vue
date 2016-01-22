@@ -1,9 +1,8 @@
 <template>
 
 	<div class="page-header">
-		<button class="btn btn-primary pull-right" v-link="{ name: 'package.create.component', params: { id: $route.params.id } }">Add component</button>
-		<a class="btn btn-link pull-right" v-link="{ name: 'packages' }">View packages</a>
-		<h1>{{ $route.params.id }}</h1>
+		<button class="btn btn-primary pull-right" v-link="appHelpers.routeToCreateComponent(packageId)">Add component</button>
+		<h1>Components</h1>
 	</div>
 
 	<alert-notification></alert-notification>
@@ -21,7 +20,7 @@
 						{{ component.name }}
 					</h4>
 				</div>
-				<div class="panel-body" @click="routeComponent(component.name)">
+				<div class="panel-body" v-link="appHelpers.routeToEditComponent(packageId, component.name)">
 					<template v-if="component.description">
 						{{ component.description }}
 					</template>
@@ -35,7 +34,7 @@
 							<i class="fa fa-circle text-red-500" v-if="missing(component.props)" :title="missing(component.props)"></i>
 							<i class="fa fa-circle text-orange-500" v-if="outsync(component.name, 'props')"></i>
 						</span>
-						{{ keys(component.props) }} properties 
+						{{ length(component.props) }} properties 
 					</li>
 				</ul>
 			</div>
@@ -52,19 +51,26 @@
 
 <script>
 	import { Isotope, IsotopeItem } from 'themekit-vue'
-	import AlertNotification from 'themekit-docs/src/mixins/alert-notification'
-	import PackageStore from 'themekit-docs/src/mixins/package-store'
+	import appStore from 'themekit-docs/src/js/app.store'
+	import AlertNotification from 'themekit-docs/src/components/alert-notification'
+	import Store from 'themekit-docs/src/mixins/store'
 	import forOwn from 'mout/object/forOwn'
 
 	export default {
 		mixins: [
-			PackageStore
+			Store
 		],
 		data () {
 			return {
 				components: [],
 				model: [],
-				sync: []
+				sync: [],
+				appHelpers: appStore.helpers
+			}
+		},
+		computed: {
+			packageId () {
+				return this.$route.params.id
 			}
 		},
 		methods: {
@@ -99,10 +105,7 @@
 					this[model] = this[model].filter((m) => m.name !== name)
 				})
 			},
-			routeComponent (name) {
-				this.$route.router.go({ name: 'package.edit.component', params: { id: this.$route.params.id, componentId: name } })
-			},
-			keys (obj) {
+			length (obj) {
 				return obj ? Object.keys(obj).length : 0
 			},
 			missing (obj) {
@@ -135,13 +138,9 @@
 			}
 		},
 		created () {
-			const packageId = this.$route.params.id
-
-			this.store.getPackageComponents(packageId).then((components) => {
-				this.components = components
-
-				this.store.onPackageComponentAdded(packageId, this.onAdded)
-				this.store.onPackageComponentRemoved(packageId, this.onRemoved)
+			this.store.getPackageComponents(this.packageId).then((components) => {
+				components.map((component) => this.onAdded(component))
+				this.store.onComponentRemoved(this.onRemoved)
 			})
 		},
 		components: {

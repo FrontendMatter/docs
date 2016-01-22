@@ -1,6 +1,6 @@
 <template>
 
-	<alert-notification></alert-notification>
+	<alert-notification fixed></alert-notification>
 
 	<!-- Loading -->
 	<div class="alert alert-default" v-if="serviceLoading">Loading data ...</div>
@@ -16,12 +16,11 @@
 						<button type="button" class="btn btn-link" @click="cancel">Cancel</button>
 						<button type="submit" class="btn btn-success">Save</button>
 					</div>
-					<h1>{{ component.name }} <small>Edit component</small></h1>
-					<a v-link="{ name: 'package', params: { id: $route.params.id } }">{{ $route.params.id }}</a> package
+					<h1 v-text="isEditView ? 'Edit component' : 'Create component'"></h1>
 				</div>
 
 				<div class="form-group" 
-					:class="{ 'has-error': hasValidationError('validation', 'name') }">
+					:class="{ 'has-error': hasValidationError('name') }">
 					<label for="name">Component name</label>
 					<input type="text" 
 						id="name"
@@ -29,17 +28,17 @@
 						v-model="model.name" 
 						v-validate:name="{ required: { rule: true, message: 'The component name is required' } }"
 						:autofocus="!isEditView"  />
-					<p class="help-block" v-for="msg in validationMessages('validation', 'name')">{{ msg }}</p>
+					<p class="help-block" v-for="msg in validationMessages('name')">{{ msg }}</p>
 				</div>
 				<div class="form-group" 
-					:class="{ 'has-error': hasValidationError('validation', 'description') }">
+					:class="{ 'has-error': hasValidationError('description') }">
 					<label for="description">Description</label>
 					<textarea id="description"
 						class="form-control" 
 						v-model="model.description" 
 						v-validate:description="{ required: { rule: true, message: 'The component description is required' } }">
 					</textarea>
-					<p class="help-block" v-for="msg in validationMessages('validation', 'description')">{{ msg }}</p>
+					<p class="help-block" v-for="msg in validationMessages('description')">{{ msg }}</p>
 				</div>
 
 				<div class="page-header">
@@ -57,7 +56,7 @@
 						v-if="isEditable('props.' + key)"
 						:name="'prop-validation-' + key">
 						<div class="form-group form-group-prop" 
-							:class="{ 'has-error': hasValidationError('prop-validation-' + key, 'description') }">
+							:class="{ 'has-error': hasValidationError('description', '$prop-validation-' + key) }">
 							<h3 id="prop-{{ key }}">{{ prop.name }}</h3>
 							<label for="prop-{{ key }}-description">Description</label>
 							<textarea id="prop-{{ key }}-description"
@@ -65,7 +64,7 @@
 								v-model="model.props[ key ].description" 
 								v-validate:description="{ required: { rule: true, message: 'The property description is required' } }">
 							</textarea>
-							<p class="help-block" v-for="msg in validationMessages('prop-validation-' + key, 'description')">{{ msg }}</p>
+							<p class="help-block" v-for="msg in validationMessages('description', '$prop-validation-' + key)">{{ msg }}</p>
 							<p class="help-block">
 								<button type="submit" class="btn btn-default">OK</button>
 								<button class="btn btn-default" @click.stop="toggleEditable('props.' + key)">Cancel</button>
@@ -124,24 +123,24 @@
 			<validator name="add-property-validation" slot="body">
 				<form @submit.prevent="submitAddProperty">
 					<div class="form-group" 
-						:class="{ 'has-error': hasValidationError('add-property-validation', 'name') }">
+						:class="{ 'has-error': hasValidationError('name', '$add-property-validation') }">
 						<label for="property-name">Property name</label>
 						<input type="text" 
 							class="form-control" 
 							v-model="property.name" 
 							v-validate:name="{ required: { rule: true, message: 'The property name is required' } }"
 							autofocus />
-						<p class="help-block" v-for="msg in validationMessages('add-property-validation', 'name')">{{ msg }}</p>
+						<p class="help-block" v-for="msg in validationMessages('name', '$add-property-validation')">{{ msg }}</p>
 					</div>
 					<div class="form-group" 
-						:class="{ 'has-error': hasValidationError('add-property-validation', 'description') }">
+						:class="{ 'has-error': hasValidationError('description', '$add-property-validation') }">
 						<label for="property-description">Description</label>
 						<textarea id="property-description"
 							class="form-control" 
 							v-model="property.description" 
 							v-validate:description="{ required: { rule: true, message: 'The property description is required' } }">
 						</textarea>
-						<p class="help-block" v-for="msg in validationMessages('add-property-validation', 'description')">{{ msg }}</p>
+						<p class="help-block" v-for="msg in validationMessages('description', '$add-property-validation')">{{ msg }}</p>
 					</div>
 				</form>
 			</validator>
@@ -153,8 +152,9 @@
 </template>
 
 <script>
-	import AlertNotification from 'themekit-docs/src/mixins/alert-notification'
-	import PackageStore from 'themekit-docs/src/mixins/package-store'
+	import appStore from 'themekit-docs/src/js/app.store'
+	import AlertNotification from 'themekit-docs/src/components/alert-notification'
+	import Store from 'themekit-docs/src/mixins/store'
 	import Validation from 'themekit-docs/src/mixins/validation'
 
 	import { Modal } from 'themekit-vue'
@@ -164,24 +164,29 @@
 	import get from 'mout/object/get'
 	import slugify from 'mout/string/slugify'
 	import camelCase from 'mout/string/camelCase'
+	import properCase from 'mout/string/properCase'
+	import unhyphenate from 'mout/string/unhyphenate'
 	
 	export default {
 		mixins: [
 			AlertNotification,
-			PackageStore,
+			Store,
 			Validation
 		],
 		data () {
 			return {
+				appHelpers: appStore.helpers,
+
 				// main form model
 				model: {
 					name: null,
+					label: null,
+					packageId: null,
 					description: null,
 					props: {},
 					events: {},
 					requirements: [],
-					demo: null,
-					packages: {}
+					demo: null
 				},
 				// sync model
 				sync: null,
@@ -211,30 +216,37 @@
 						if (!valid) {
 							return false
 						}
-						valid = this.getValidator('prop-validation-' + key).valid
+						valid = this.getValidator('$prop-validation-' + key).valid
 					}
 				})
 				return this.$validation.valid && valid
 			},
-			isEditView () {
+			packageId () {
+				return this.$route.params.id
+			},
+			componentId () {
 				return this.$route.params.componentId
+			},
+			isEditView () {
+				return this.componentId
 			}
 		},
 		methods: {
 			create () {
 				this.didSubmit = true
 				if (this.valid) {
-					this.store.setComponent(this.model.name, this.modelSaveFormatter()).then(() => {
+					this.model.label = properCase(unhyphenate(this.model.name))
+					this.store.setComponent(this.model.name, this.saveFormatter()).then(() => {
 						this.didSubmit = false
 						this.success('The component was saved.')
 					})
 				}
 			},
 			goToPackage () {
-				this.$route.router.go({ name: 'package', params: { id: this.$route.params.id } })
+				this.$route.router.go(this.appHelpers.routeToPackageComponents(this.packageId))
 			},
 			goToEditComponent () {
-				this.$route.router.go({ name: 'package.edit.component', params: { id: this.$route.params.id, componentId: this.model.name } })
+				this.$route.router.go(this.appHelpers.routeToEditComponent(this.packageId, this.model.name))
 			},
 			cancel () {
 				this.goToPackage()
@@ -263,7 +275,7 @@
 				})
 				return model
 			},
-			modelSaveFormatter () {
+			saveFormatter () {
 				let model = JSON.parse(JSON.stringify(this.model))
 				forOwn(model.props, (prop, key) => {
 					if (!prop.description || prop.description.length === 0) {
@@ -276,7 +288,7 @@
 
 				// validate
 				this.didSubmit = true
-				if (this.getValidator('add-property-validation').invalid) {
+				if (this.getValidator('$add-property-validation').invalid) {
 					return abort('save')
 				}
 
@@ -315,11 +327,6 @@
 			}
 		},
 		created () {
-			const packageId = this.$route.params.id
-			const componentId = this.$route.params.componentId
-
-			this.model.packages[packageId] = true
-
 			this.store.on('serviceLoading', () => {
 				$('button[type="submit"]').prop('disabled', true)
 			})
@@ -330,8 +337,8 @@
 				}, 200)
 			})
 
-			if (componentId) {
-				this.store.getComponent(componentId).then(({ component, sync }) => {
+			if (this.isEditView) {
+				this.store.getComponent(this.componentId).then(({ component, sync }) => {
 					if (component && sync) {
 						this.model = merge(this.modelSyncFormatter(sync), component)
 					}
@@ -344,7 +351,13 @@
 					if (sync) {
 						this.sync = sync
 					}
+					if (!this.model.packageId) {
+						this.model.packageId = this.packageId
+					}
 				})
+			}
+			else {
+				this.model.packageId = this.packageId
 			}
 		},
 		events: {

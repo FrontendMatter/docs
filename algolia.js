@@ -4,8 +4,8 @@ var client = algoliasearch(config.get('algolia.appId'), config.get('algolia.writ
 var index = client.initIndex('components')
 var moment = require('moment')
 
-var store = require('./lib/package-store')
-store.setRef(config.get('packageStoreFirebaseRef'))
+var store = require('./lib/store')
+store.setRef(config.get('storeFirebaseRef'))
 
 function now () {
 	return moment().format('MM/DD/YYYY HH:mm:ss')

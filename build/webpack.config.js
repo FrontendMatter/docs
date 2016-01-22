@@ -16,7 +16,7 @@ module.exports = new WebpackConfig()
 						appId: JSON.stringify(config.get('algolia.appId')),
 						apiKey: JSON.stringify(config.get('algolia.apiKey'))
 					},
-					packageStoreFirebaseRef: JSON.stringify(config.get('packageStoreFirebaseRef'))
+					storeFirebaseRef: JSON.stringify(config.get('storeFirebaseRef'))
 				}
 			})
 		]

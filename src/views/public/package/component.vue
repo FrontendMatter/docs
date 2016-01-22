@@ -1,7 +1,7 @@
 <template>
 	<tabs nav-id="tabs-navbar" :class="tabs">
 		<tab-pane active icon="fa fa-fw fa-file-text-o" label="Docs">
-			<div class="container">
+			<div class="container-fluid docs-container">
 				
 				<template v-if="component">
 					<h1 class="component-name">{{ component.label }}</h1>
@@ -58,7 +58,7 @@
 							The {{ component.label }} component is using:
 							<ul class="list-unstyled">
 								<li v-for="used in component.components">
-									<a v-link="appHelpers.routeToComponent(packageId, used.name)" v-text="used.label"></a>
+									<a v-link="appHelpers.routeToComponent(packageId, used.id)" v-text="used.label"></a>
 								</li>
 							</ul>
 						</blockquote>
@@ -125,11 +125,10 @@
 				</template>
 
 				<template v-if="!component">
-					<h1>{{ componentName }}</h1>
-					<h3 v-if="!componentError">Loading component ...</h3>
+					<div class="alert alert-default" v-if="serviceLoading">Loading data ...</div>
 					<template v-else>
+						<h1>{{ componentId }}</h1>
 						<h3>The component was not found.</h3>
-						<p v-html="componentError"></p>
 					</template>
 				</template>
 			</div>
@@ -142,7 +141,7 @@
 
 <script>
 	import appStore from 'themekit-docs/src/js/app.store'
-	import PackageStore from 'themekit-docs/src/mixins/package-store'
+	import Store from 'themekit-docs/src/mixins/store'
 	import { Tabs } from 'themekit-vue'
 	import { TabPane } from 'themekit-vue'
 	import marked from 'marked'
@@ -168,7 +167,7 @@
 
 	export default {
 		mixins: [
-			PackageStore
+			Store
 		],
 		filters: {
 			marked: marked,

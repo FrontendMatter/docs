@@ -45,6 +45,10 @@ import Vue from 'vue'
 import VueValidator from 'vue-validator'
 Vue.use(VueValidator)
 
+// VueTransferDom
+import VueTransferDom from 'vue-transfer-dom'
+Vue.use(VueTransferDom)
+
 // ThemeKit
 import ThemeKit from 'themekit-vue'
 Vue.use(ThemeKit)

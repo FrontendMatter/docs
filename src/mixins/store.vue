@@ -1,7 +1,7 @@
 <script>
-	import store from 'themekit-docs/src/lib/package-store'
 	import appStore from 'themekit-docs/src/js/app.store'
-	import AlertNotification from 'themekit-docs/src/mixins/alert-notification'
+	import AlertNotification from 'themekit-docs/src/components/alert-notification'
+	import store from 'themekit-docs/src/lib/store'
 
 	export default {
 		mixins: [
@@ -9,9 +9,9 @@
 		],
 		data () {
 			return {
+				appConfig: appStore.config,
 				serviceLoading: false,
-				serviceCompleteDebounce: null,
-				appConfig: appStore.config
+				serviceCompleteDebounce: null
 			}
 		},
 		methods: {
@@ -27,8 +27,8 @@
 			}
 		},
 		created () {
-			store.setRef(this.appConfig.packageStoreFirebaseRef)
-			store.once('serviceLoading', this.onServiceLoading)
+			store.setRef(this.appConfig.storeFirebaseRef)
+			store.on('serviceLoading', this.onServiceLoading)
 			store.on('serviceComplete', this.onServiceComplete)
 			store.on('serviceError', this.onServiceError)
 			this.store = store
