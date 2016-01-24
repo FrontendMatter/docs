@@ -4,8 +4,6 @@
   "license": "ISC",
   "private": true,
   "dependencies": {
-    "jquery.breakpoints": "*",
-    "simplebar": "lazabogdan/simplebar#master",
     "modernizr": "~2.8.3"
   }
 }
