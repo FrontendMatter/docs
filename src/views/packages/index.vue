@@ -39,7 +39,7 @@
 <script>
 	import appStore from 'themekit-docs/src/js/app.store'
 	import Store from 'themekit-docs/src/mixins/store'
-	import { Isotope, IsotopeItem } from 'themekit-vue'
+	import { Isotope, IsotopeItem } from 'vue-isotope'
 	import crop from 'mout/string/crop'
 
 	export default {

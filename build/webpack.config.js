@@ -5,7 +5,6 @@ var path = require('path')
 
 module.exports = new WebpackConfig()
 	.withEntry('js/main.js')
-	.withEntry('js/manage.js')
 	.withEntry('js/vendor.js')
 	.withAlias({ 'themekit-docs': path.resolve(__dirname, '..') })
 	.webpack({

@@ -11,25 +11,25 @@ router.map({
 	'/': {
 		name: 'packages',
 		component: function (resolve) {
-			require(['../views/public/packages/index'], resolve)
+			require(['../views/packages/index'], resolve)
 		}
 	},
 	'/package/:id': {
 		name: 'package',
 		component: function (resolve) {
-			require(['../views/public/package/package'], resolve)
+			require(['../views/package/package'], resolve)
 		}
 	},
 	'/package/:id/components/:componentId': {
 		name: 'component',
 		component: function (resolve) {
-			require(['../views/public/package/component'], resolve)
+			require(['../views/package/component'], resolve)
 		}
 	},
 	'/package/:id/pages/:slug/:pageId': {
 		name: 'page',
 		component: function (resolve) {
-			require(['../views/public/package/page'], resolve)
+			require(['../views/package/page'], resolve)
 		}
 	}
 })

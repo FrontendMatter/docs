@@ -87,7 +87,7 @@
 <script>
 	import appStore from 'themekit-docs/src/js/app.store'
 	import Store from 'themekit-docs/src/mixins/store'
-	import AlgoliaInstantsearchDropdown from 'themekit-docs/src/components/algolia-instantsearch-dropdown'
+	import { AlgoliaInstantsearchDropdown } from 'vue-algolia'
 	import { LayoutTransition } from 'themekit-vue'
 	import { SidebarTransition } from 'themekit-vue'
 	import { SidebarToggleButton } from 'themekit-vue'

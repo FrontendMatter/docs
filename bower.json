@@ -1,6 +1,6 @@
 {
-  "name": "themekit",
-  "description": "ThemeKit Docs",
+  "name": "themekit-docs-app",
+  "description": "ThemeKit Docs App.",
   "license": "ISC",
   "private": true,
   "dependencies": {

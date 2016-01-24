@@ -12,6 +12,9 @@ import 'font-awesome/css/font-awesome'
 import 'themekit-vue/dist/themekit.css'
 import 'themekit-vue/src/sass/_themekit'
 
+// HIGHLIGHT.JS
+import 'highlight.js/styles/github-gist.css'
+
 // DOCS
 import '../sass/_docs'
 
@@ -24,30 +27,15 @@ import 'bootstrap-sass/assets/javascripts/bootstrap'
 import 'modernizr/modernizr'
 
 // EXTERNALS
+import appStore from 'themekit-docs/src/js/app.store'
 
-// ISOTOPE
-import Isotope from 'isotope-layout'
-import Packery from 'isotope-packery'
-window.Isotope = Isotope
-window.Packery = Packery
-
-// HIGHLIGHT.JS
-import 'highlight.js/lib/highlight'
-import 'highlight.js/styles/github-gist'
-import 'highlight.js/lib/languages/xml'
-import 'highlight.js/lib/languages/javascript'
-import 'js-beautify'
+// MARKED
+import marked from 'marked'
+marked.setOptions(appStore.config.marked)
+window.marked = marked
 
 // Vue library
 import Vue from 'vue'
-
-// Vue Validator
-import VueValidator from 'vue-validator'
-Vue.use(VueValidator)
-
-// VueTransferDom
-import VueTransferDom from 'vue-transfer-dom'
-Vue.use(VueTransferDom)
 
 // ThemeKit
 import ThemeKit from 'themekit-vue'

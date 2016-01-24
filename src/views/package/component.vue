@@ -144,14 +144,7 @@
 	import Store from 'themekit-docs/src/mixins/store'
 	import { Tabs } from 'themekit-vue'
 	import { TabPane } from 'themekit-vue'
-	import marked from 'marked'
 	import pascalCase from 'mout/string/pascalCase'
-
-	marked.setOptions({
-		highlight: function (code) {
-			return require('highlight.js').highlightAuto(code).value
-		}
-	})
 
 	function unindent (str) {
 		var match = str.match(/^[ \t]*(?=\S)/gm)
@@ -170,7 +163,7 @@
 			Store
 		],
 		filters: {
-			marked: marked,
+			marked: window.marked,
 			unindent: unindent,
 			separatorLast: function ($index, $length, separator, lastSeparator) {
 				if ($index === $length - 2) {

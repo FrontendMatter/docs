@@ -1,5 +1,5 @@
 // The main application
-import App from '../views/public/index'
+import App from '../views/main'
 
 // Vue router
 import router from './router.main'

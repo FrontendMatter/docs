@@ -1,7 +1,7 @@
 <script>
 	import appStore from 'themekit-docs/src/js/app.store'
-	import AlertNotification from 'themekit-docs/src/components/alert-notification'
-	import store from 'themekit-docs/src/lib/store'
+	import { AlertNotification } from 'themekit-vue'
+	import store from 'themekit-docs-store'
 
 	export default {
 		mixins: [
