@@ -1,6 +1,9 @@
 <template>
 	<tabs nav-id="tabs-navbar" :class="tabs">
-		<tab-pane active icon="fa fa-fw fa-file-text-o" label="Docs">
+		<tab-pane id="demo" label="Demo" v-show="hasDemos" :active="hasDemos" :visible="hasDemos">
+			<iframe v-if="hasDemos" :src="demos[0].url" frameborder="0"></iframe>
+		</tab-pane>
+		<tab-pane :active="!hasDemos" icon="fa fa-fw fa-file-text-o" label="Docs">
 			<div class="container-fluid docs-container">
 				
 				<template v-if="component">
@@ -133,9 +136,6 @@
 				</template>
 			</div>
 		</tab-pane>
-		<tab-pane id="demo" label="Demo" v-if="component.demo">
-			<iframe :src="component.demo" frameborder="0"></iframe>
-		</tab-pane>
 	</tabs>
 </template>
 
@@ -179,7 +179,8 @@
 				component: null,
 				tabId: null,
 				appState: appStore.state,
-				appHelpers: appStore.helpers
+				appHelpers: appStore.helpers,
+				demos: []
 			}
 		},
 		route: {
@@ -216,11 +217,22 @@
 				return {
 					'tabs-demo': this.tabId === 'demo'
 				}
+			},
+			hasDemos () {
+				return this.demos.length > 0
 			}
 		},
 		created () {
 			this.store.getComponent(this.componentId).then(({ merge }) => {
 				this.component = merge
+			})
+			this.store.getComponentDemos(this.componentId).then((demos) => {
+				demos.map((demo) => {
+					const exists = this.demos.find((d) => d.objectId === demo.objectId)
+					if (!exists) {
+						this.demos.push(demo)
+					}
+				})
 			})
 		},
 		events: {

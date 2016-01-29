@@ -8,7 +8,7 @@
 		<!-- Display list -->
 		<isotope v-if="!serviceLoading && packages.length">
 			<isotope-item class="col-md-4" v-for="package in packages">
-				<div class="panel panel-default panel-package" v-link="appHelpers.routeToPackage(package.name)">
+				<div class="panel panel-default panel-package" v-link="appHelpers.routeToPackage(package.objectId)">
 					<div class="panel-heading">
 						<h4 class="panel-title">
 							{{ package.name }}

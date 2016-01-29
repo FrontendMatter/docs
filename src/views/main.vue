@@ -45,8 +45,8 @@
 
 				<a v-link="appHelpers.routeToPackages()" slot="brand" class="sidebar-brand"><i class="fa fa-fw fa-chevron-left"></i> Packages</a>
 
-				<div class="sidebar-block bg-white">
-					<h4 class="sidebar-category">{{ packageId }}</h4>
+				<div class="sidebar-block bg-white" v-if="pkg">
+					<h4 class="sidebar-category">{{ pkg.name }}</h4>
 					<a v-link="appHelpers.routeToPackage(packageId)">Package Overview</a>
 				</div>
 
@@ -105,6 +105,7 @@
 			return {
 				components: [],
 				pages: [],
+				pkg: null,
 				appConfig: appStore.config,
 				appHelpers: appStore.helpers,
 				appState: appStore.state
@@ -131,7 +132,7 @@
 					children: this.pages.map((page) => {
 						return {
 							label: page.title,
-							route: this.appHelpers.routeToPage(page.packageId, page.slug, page.pageId)
+							route: this.appHelpers.routeToPage(page.packageId, page.slug, page.objectId)
 						}
 					})
 				}, {
@@ -144,7 +145,7 @@
 					children: this.components.map((component) => {
 						return {
 							label: component.label,
-							route: this.appHelpers.routeToComponent(component.packageId, component.name)
+							route: this.appHelpers.routeToComponent(component.packageId, component.objectId)
 						}
 					})
 				}]
@@ -152,7 +153,7 @@
 		},
 		methods: {
 			transformHit (hit) {
-				hit.route = this.appHelpers.routeToComponent(hit.packageId, hit.name)
+				hit.route = this.appHelpers.routeToComponent(hit.packageId, hit.objectId)
 				return hit
 			},
 			loadPackageSidebar () {
@@ -167,6 +168,7 @@
 		created () {
 			if (this.isPackageView) {
 				this.loadPackageSidebar()
+				this.store.getPackage(this.packageId).then((pkg) => this.pkg = pkg)
 			}
 		},
 		watch: {
