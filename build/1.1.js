@@ -1,16 +1,16 @@
 webpackJsonp([1],{
 
-/***/ 187:
+/***/ 208:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_script__, __vue_template__
-	__webpack_require__(188)
-	__vue_script__ = __webpack_require__(192)
+	__webpack_require__(209)
+	__vue_script__ = __webpack_require__(213)
 	if (__vue_script__ &&
 	    __vue_script__.__esModule &&
 	    Object.keys(__vue_script__).length > 1) {
 	  console.warn("[vue-loader] src/views/packages/index.vue: named exports in *.vue files are ignored.")}
-	__vue_template__ = __webpack_require__(196)
+	__vue_template__ = __webpack_require__(215)
 	module.exports = __vue_script__ || {}
 	if (module.exports.__esModule) module.exports = module.exports.default
 	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
@@ -28,16 +28,16 @@ webpackJsonp([1],{
 
 /***/ },
 
-/***/ 188:
+/***/ 209:
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(189);
+	var content = __webpack_require__(210);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(191)(content, {});
+	var update = __webpack_require__(212)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -55,10 +55,10 @@ webpackJsonp([1],{
 
 /***/ },
 
-/***/ 189:
+/***/ 210:
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(190)();
+	exports = module.exports = __webpack_require__(211)();
 	// imports
 
 
@@ -70,7 +70,7 @@ webpackJsonp([1],{
 
 /***/ },
 
-/***/ 190:
+/***/ 211:
 /***/ function(module, exports) {
 
 	/*
@@ -127,7 +127,7 @@ webpackJsonp([1],{
 
 /***/ },
 
-/***/ 191:
+/***/ 212:
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -382,7 +382,7 @@ webpackJsonp([1],{
 
 /***/ },
 
-/***/ 192:
+/***/ 213:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -391,72 +391,30 @@ webpackJsonp([1],{
 		value: true
 	});
 
-	var _app = __webpack_require__(3);
+	var _app = __webpack_require__(20);
 
 	var _app2 = _interopRequireDefault(_app);
 
-	var _store = __webpack_require__(152);
+	var _store = __webpack_require__(169);
 
 	var _store2 = _interopRequireDefault(_store);
 
-	var _vueIsotope = __webpack_require__(193);
-
-	var _crop = __webpack_require__(194);
-
-	var _crop2 = _interopRequireDefault(_crop);
+	var _vueIsotope = __webpack_require__(214);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	// <template>
-	//
-	// 	<div class="container-fluid docs-container">
-	//
-	// 		<!-- Service Loading -->
-	// 		<div class="alert alert-default" v-if="serviceLoading">Loading ...</div>
-	//
-	// 		<!-- Display list -->
-	// 		<isotope v-if="!serviceLoading && packages.length">
-	// 			<isotope-item class="col-md-4" v-for="package in packages">
-	// 				<div class="panel panel-default panel-package" v-link="appHelpers.routeToPackage(package.name)">
-	// 					<div class="panel-heading">
-	// 						<h4 class="panel-title">
-	// 							{{ package.name }}
-	// 						</h4>
-	// 					</div>
-	// 					<template v-if="package.content">
-	// 						<div class="panel-body">
-	// 							{{ package.content | excerpt 60 }}
-	// 						</div>
-	// 						<hr>
-	// 					</template>
-	// 					<div class="panel-body text-center">
-	// 						<strong>{{ package.components }}</strong> components
-	// 					</div>
-	// 				</div>
-	// 			</isotope-item>
-	// 		</isotope>
-	//
-	// 		<!-- No packages -->
-	// 		<div class="alert alert-default" v-if="!serviceLoading && !packages.length">
-	// 			No packages to display.
-	// 		</div>
-	//
-	// 	</div>
-	//
-	// </template>
-	//
-	// <script>
 	exports.default = {
 		mixins: [_store2.default],
-		filters: {
-			excerpt: function excerpt(value, length) {
-				return (0, _crop2.default)(value, length || 30);
+		route: {
+			activate: function activate() {
+				this.appState.page.title = 'Packages';
 			}
 		},
 		data: function data() {
 			return {
 				packages: [],
-				appHelpers: _app2.default.helpers
+				appHelpers: _app2.default.helpers,
+				appState: _app2.default.state
 			};
 		},
 		created: function created() {
@@ -479,10 +437,44 @@ webpackJsonp([1],{
 	// 		cursor: pointer;
 	// 	}
 	// </style>
+	// <template>
+	//
+	// 	<div class="container-fluid docs-container">
+	//
+	// 		<!-- Service Loading -->
+	// 		<div class="alert alert-default" v-if="serviceLoading">Loading ...</div>
+	//
+	// 		<!-- Display list -->
+	// 		<isotope v-if="!serviceLoading && packages.length">
+	// 			<isotope-item class="col-md-4" v-for="package in packages">
+	// 				<div class="panel panel-default panel-package" v-link="appHelpers.routeToPackage(package.packageIdData.packageName, package.packageVersionIdData.version)">
+	// 					<div class="panel-heading">
+	// 						<h4 class="panel-title">
+	// 							<a v-link="appHelpers.routeToPackage(package.packageIdData.packageName, package.packageVersionIdData.version)">{{ package.packageIdData.packageName }}</a>
+	// 						</h4>
+	// 					</div>
+	// 					<div class="panel-body">
+	// 						<span class="label label-default">{{ package.packageVersionIdData.version }}</span>
+	// 						<template v-if="package.description">{{ package.description.data }}</template>
+	// 					</div>
+	// 				</div>
+	// 			</isotope-item>
+	// 		</isotope>
+	//
+	// 		<!-- No packages -->
+	// 		<div class="alert alert-default" v-if="!serviceLoading && !packages.length">
+	// 			No packages to display.
+	// 		</div>
+	//
+	// 	</div>
+	//
+	// </template>
+	//
+	// <script>
 
 /***/ },
 
-/***/ 193:
+/***/ 214:
 /***/ function(module, exports, __webpack_require__) {
 
 	!function(t,e){ true?module.exports=e():"function"==typeof define&&define.amd?define([],e):"object"==typeof exports?exports.VueIsotope=e():t.VueIsotope=e()}(this,function(){return function(t){function e(o){if(i[o])return i[o].exports;var n=i[o]={exports:{},id:o,loaded:!1};return t[o].call(n.exports,n,n.exports,e),n.loaded=!0,n.exports}var i={};return e.m=t,e.c=i,e.p="",e(0)}([function(t,e,i){"use strict";function o(t){return t&&t.__esModule?t:{"default":t}}Object.defineProperty(e,"__esModule",{value:!0});var n=i(28),r=o(n),s=i(27),a=o(s),h={Isotope:r["default"],IsotopeItem:a["default"]};h.install=function(t){},"undefined"!=typeof window&&window.Vue&&window.Vue.use(h),e["default"]=h,t.exports=e["default"]},function(t,e,i){var o=!1;(function(){/*!
@@ -564,57 +556,10 @@ webpackJsonp([1],{
 
 /***/ },
 
-/***/ 194:
-/***/ function(module, exports, __webpack_require__) {
-
-	var toString = __webpack_require__(168);
-	var truncate = __webpack_require__(195);
-	    /**
-	     * Truncate string at full words.
-	     */
-	     function crop(str, maxChars, append) {
-	         str = toString(str);
-	         return truncate(str, maxChars, append, true);
-	     }
-
-	     module.exports = crop;
-
-
-
-/***/ },
-
-/***/ 195:
-/***/ function(module, exports, __webpack_require__) {
-
-	var toString = __webpack_require__(168);
-	var trim = __webpack_require__(176);
-	    /**
-	     * Limit number of chars.
-	     */
-	    function truncate(str, maxChars, append, onlyFullWords){
-	        str = toString(str);
-	        append = append || '...';
-	        maxChars = onlyFullWords? maxChars + 1 : maxChars;
-
-	        str = trim(str);
-	        if(str.length <= maxChars){
-	            return str;
-	        }
-	        str = str.substr(0, maxChars - append.length);
-	        //crop at last space or remove trailing whitespace
-	        str = onlyFullWords? str.substr(0, str.lastIndexOf(' ')) : trim(str);
-	        return str + append;
-	    }
-	    module.exports = truncate;
-
-
-
-/***/ },
-
-/***/ 196:
+/***/ 215:
 /***/ function(module, exports) {
 
-	module.exports = "\n\n<div class=\"container-fluid docs-container\">\n\n\t<!-- Service Loading -->\n\t<div class=\"alert alert-default\" v-if=\"serviceLoading\">Loading ...</div>\n\t\n\t<!-- Display list -->\n\t<isotope v-if=\"!serviceLoading && packages.length\">\n\t\t<isotope-item class=\"col-md-4\" v-for=\"package in packages\">\n\t\t\t<div class=\"panel panel-default panel-package\" v-link=\"appHelpers.routeToPackage(package.name)\">\n\t\t\t\t<div class=\"panel-heading\">\n\t\t\t\t\t<h4 class=\"panel-title\">\n\t\t\t\t\t\t{{ package.name }}\n\t\t\t\t\t</h4>\n\t\t\t\t</div>\n\t\t\t\t<template v-if=\"package.content\">\n\t\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t\t{{ package.content | excerpt 60 }}\n\t\t\t\t\t</div>\n\t\t\t\t\t<hr>\n\t\t\t\t</template>\n\t\t\t\t<div class=\"panel-body text-center\">\n\t\t\t\t\t<strong>{{ package.components }}</strong> components\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</isotope-item>\n\t</isotope>\n\n\t<!-- No packages -->\n\t<div class=\"alert alert-default\" v-if=\"!serviceLoading && !packages.length\">\n\t\tNo packages to display.\n\t</div>\n\t\n</div>\n\n";
+	module.exports = "\n\n<div class=\"container-fluid docs-container\">\n\n\t<!-- Service Loading -->\n\t<div class=\"alert alert-default\" v-if=\"serviceLoading\">Loading ...</div>\n\t\n\t<!-- Display list -->\n\t<isotope v-if=\"!serviceLoading && packages.length\">\n\t\t<isotope-item class=\"col-md-4\" v-for=\"package in packages\">\n\t\t\t<div class=\"panel panel-default panel-package\" v-link=\"appHelpers.routeToPackage(package.packageIdData.packageName, package.packageVersionIdData.version)\">\n\t\t\t\t<div class=\"panel-heading\">\n\t\t\t\t\t<h4 class=\"panel-title\">\n\t\t\t\t\t\t<a v-link=\"appHelpers.routeToPackage(package.packageIdData.packageName, package.packageVersionIdData.version)\">{{ package.packageIdData.packageName }}</a>\n\t\t\t\t\t</h4>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t<span class=\"label label-default\">{{ package.packageVersionIdData.version }}</span>\n\t\t\t\t\t<template v-if=\"package.description\">{{ package.description.data }}</template>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</isotope-item>\n\t</isotope>\n\n\t<!-- No packages -->\n\t<div class=\"alert alert-default\" v-if=\"!serviceLoading && !packages.length\">\n\t\tNo packages to display.\n\t</div>\n\t\n</div>\n\n";
 
 /***/ }
 

@@ -1,6 +1,6 @@
 webpackJsonp([3],{
 
-/***/ 190:
+/***/ 211:
 /***/ function(module, exports) {
 
 	/*
@@ -57,7 +57,7 @@ webpackJsonp([3],{
 
 /***/ },
 
-/***/ 191:
+/***/ 212:
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -312,17 +312,17 @@ webpackJsonp([3],{
 
 /***/ },
 
-/***/ 201:
+/***/ 219:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_script__, __vue_template__
-	__webpack_require__(202)
-	__vue_script__ = __webpack_require__(204)
+	__webpack_require__(220)
+	__vue_script__ = __webpack_require__(222)
 	if (__vue_script__ &&
 	    __vue_script__.__esModule &&
 	    Object.keys(__vue_script__).length > 1) {
 	  console.warn("[vue-loader] src/views/package/component.vue: named exports in *.vue files are ignored.")}
-	__vue_template__ = __webpack_require__(218)
+	__vue_template__ = __webpack_require__(234)
 	module.exports = __vue_script__ || {}
 	if (module.exports.__esModule) module.exports = module.exports.default
 	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
@@ -340,16 +340,16 @@ webpackJsonp([3],{
 
 /***/ },
 
-/***/ 202:
+/***/ 220:
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(203);
+	var content = __webpack_require__(221);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(191)(content, {});
+	var update = __webpack_require__(212)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -367,10 +367,10 @@ webpackJsonp([3],{
 
 /***/ },
 
-/***/ 203:
+/***/ 221:
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(190)();
+	exports = module.exports = __webpack_require__(211)();
 	// imports
 
 
@@ -382,12 +382,12 @@ webpackJsonp([3],{
 
 /***/ },
 
-/***/ 204:
+/***/ 222:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _keys = __webpack_require__(205);
+	var _keys = __webpack_require__(223);
 
 	var _keys2 = _interopRequireDefault(_keys);
 
@@ -395,41 +395,34 @@ webpackJsonp([3],{
 		value: true
 	});
 
-	var _app = __webpack_require__(3);
+	var _app = __webpack_require__(20);
 
 	var _app2 = _interopRequireDefault(_app);
 
-	var _store = __webpack_require__(152);
+	var _store = __webpack_require__(169);
 
 	var _store2 = _interopRequireDefault(_store);
 
-	var _themekitVue = __webpack_require__(154);
+	var _themekitVue = __webpack_require__(171);
 
-	var _pascalCase = __webpack_require__(217);
+	var _pascalCase = __webpack_require__(227);
 
 	var _pascalCase2 = _interopRequireDefault(_pascalCase);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function unindent(str) {
-		var match = str.match(/^[ \t]*(?=\S)/gm);
-		if (!match) {
-			return str;
-		}
-		var indent = Math.min.apply(Math, match.map(function (el) {
-			return el.length;
-		}));
-		var re = new RegExp('^[ \\t]{' + indent + '}', 'gm');
-		return indent > 0 ? str.replace(re, '') : str;
-	} // <template>
+	// <template>
 	// 	<tabs nav-id="tabs-navbar" :class="tabs">
-	// 		<tab-pane active icon="fa fa-fw fa-file-text-o" label="Docs">
+	// 		<tab-pane id="demo" label="Demo" v-show="hasDemos" :active="hasDemos" :visible="hasDemos">
+	// 			<iframe v-if="hasDemos" :src="demos[0].url" frameborder="0"></iframe>
+	// 		</tab-pane>
+	// 		<tab-pane :active="!hasDemos" icon="fa fa-fw fa-file-text-o" label="Docs">
 	// 			<div class="container-fluid docs-container">
 	//
 	// 				<template v-if="component">
 	// 					<h1 class="component-name">{{ component.label }}</h1>
 	// 					<template v-if="component.description">
-	// 						{{{ component.description | unindent | marked }}}
+	// 						{{{ component.description.data | marked }}}
 	// 					</template>
 	//
 	// 					<template v-if="component.requirements.length">
@@ -511,13 +504,13 @@ webpackJsonp([3],{
 	// 						<template v-for="slot in component.slots">
 	// 							<div class="panel panel-default panel-body">
 	// 								<h4>{{ slot.name }}</h4>
-	// 								<p v-if="slot.description">{{{ slot.description | unindent | marked }}}</p>
+	// 								<p v-if="slot.description">{{{ slot.description | marked }}}</p>
 	// 							</div>
 	// 						</template>
 	// 						<hr>
 	// 					</template>
 	//
-	// 					<template v-if="component.props">
+	// 					<template v-if="component.props.length">
 	// 						<h3>Properties</h3>
 	// 						<blockquote>
 	// 							<p>Properties define how the component expects to receive data from its parent.</p>
@@ -526,11 +519,11 @@ webpackJsonp([3],{
 	// 						<p>The {{ component.label }} component exposes the following properties:</p>
 	// 						<template v-for="prop in component.props">
 	// 							<div class="panel panel-default panel-body">
-	// 								<h4>{{ prop.name }}</h4>
-	// 								<template v-if="prop.description">{{{ prop.description | unindent | marked }}}</template>
-	// 								<h5 v-if="prop.type">type: <code>{{ prop.type }}</code></h5>
-	// 								<h5 v-if="prop.default">default: <code>{{ prop.default }}</code></h5>
-	// 								<h5 v-if="prop.required">required: <code>true</code></h5>
+	// 								<h4>{{ prop.prop.name }}</h4>
+	// 								<template v-if="prop.description">{{{ prop.description.data | marked }}}</template>
+	// 								<h5 v-if="prop.prop.type">type: <code>{{ prop.prop.type }}</code></h5>
+	// 								<h5 v-if="prop.prop.default">default: <code>{{ prop.prop.default }}</code></h5>
+	// 								<h5 v-if="prop.prop.required">required: <code>true</code></h5>
 	// 							</div>
 	// 						</template>
 	// 						<hr>
@@ -547,28 +540,23 @@ webpackJsonp([3],{
 	// 					</template>
 	// 				</template>
 	//
-	// 				<template v-if="!component">
-	// 					<div class="alert alert-default" v-if="serviceLoading">Loading data ...</div>
+	// 				<template v-if="!component && !serviceLoading && appState.pkg">
 	// 					<template v-else>
 	// 						<h1>{{ componentId }}</h1>
 	// 						<h3>The component was not found.</h3>
 	// 					</template>
 	// 				</template>
+	//
+	// 				<div class="alert alert-default" v-if="serviceLoading && !component">Loading data ...</div>
 	// 			</div>
-	// 		</tab-pane>
-	// 		<tab-pane id="demo" label="Demo" v-if="component.demo">
-	// 			<iframe :src="component.demo" frameborder="0"></iframe>
 	// 		</tab-pane>
 	// 	</tabs>
 	// </template>
 	//
 	// <script>
-
 	exports.default = {
 		mixins: [_store2.default],
 		filters: {
-			marked: window.marked,
-			unindent: unindent,
 			separatorLast: function separatorLast($index, $length, separator, lastSeparator) {
 				if ($index === $length - 2) {
 					return lastSeparator || ' or ';
@@ -587,15 +575,15 @@ webpackJsonp([3],{
 			};
 		},
 
-		route: {
-			canReuse: false
-		},
 		computed: {
-			componentId: function componentId() {
-				return this.$route.params.componentId;
+			componentName: function componentName() {
+				return this.$route.params.componentName;
 			},
-			packageId: function packageId() {
-				return this.$route.params.id;
+			packageName: function packageName() {
+				return this.$route.params.packageName;
+			},
+			version: function version() {
+				return this.$route.params.version;
 			},
 			components: function components() {
 				return this.appState.components;
@@ -624,21 +612,35 @@ webpackJsonp([3],{
 				return {
 					'tabs-demo': this.tabId === 'demo'
 				};
+			},
+			demos: function demos() {
+				if (this.component) {
+					return this.component.demos;
+				}
+				return [];
+			},
+			hasDemos: function hasDemos() {
+				return this.demos.length > 0;
 			}
 		},
 		created: function created() {
 			var _this3 = this;
 
-			this.store.getComponent(this.componentId).then(function (_ref) {
-				var merge = _ref.merge;
-
-				_this3.component = merge;
+			this.store.getComponentVersionByName(this.componentName, this.packageName, this.version).then(function (data) {
+				return _this3.component = data;
 			});
 		},
 
 		events: {
 			'shown.tk.tab': function shownTkTab(tabId) {
 				this.tabId = tabId;
+			}
+		},
+		watch: {
+			component: function component(value) {
+				if (value) {
+					this.appState.page.title = this.component.label;
+				}
 			}
 		},
 		components: {
@@ -681,28 +683,28 @@ webpackJsonp([3],{
 
 /***/ },
 
-/***/ 205:
+/***/ 223:
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(206), __esModule: true };
+	module.exports = { "default": __webpack_require__(224), __esModule: true };
 
 /***/ },
 
-/***/ 206:
+/***/ 224:
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(207);
-	module.exports = __webpack_require__(213).Object.keys;
+	__webpack_require__(225);
+	module.exports = __webpack_require__(10).Object.keys;
 
 /***/ },
 
-/***/ 207:
+/***/ 225:
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.2.14 Object.keys(O)
-	var toObject = __webpack_require__(208);
+	var toObject = __webpack_require__(15);
 
-	__webpack_require__(210)('keys', function($keys){
+	__webpack_require__(226)('keys', function($keys){
 	  return function keys(it){
 	    return $keys(toObject(it));
 	  };
@@ -710,35 +712,13 @@ webpackJsonp([3],{
 
 /***/ },
 
-/***/ 208:
-/***/ function(module, exports, __webpack_require__) {
-
-	// 7.1.13 ToObject(argument)
-	var defined = __webpack_require__(209);
-	module.exports = function(it){
-	  return Object(defined(it));
-	};
-
-/***/ },
-
-/***/ 209:
-/***/ function(module, exports) {
-
-	// 7.2.1 RequireObjectCoercible(argument)
-	module.exports = function(it){
-	  if(it == undefined)throw TypeError("Can't call method on  " + it);
-	  return it;
-	};
-
-/***/ },
-
-/***/ 210:
+/***/ 226:
 /***/ function(module, exports, __webpack_require__) {
 
 	// most Object methods by ES6 should accept primitives
-	var $export = __webpack_require__(211)
-	  , core    = __webpack_require__(213)
-	  , fails   = __webpack_require__(216);
+	var $export = __webpack_require__(8)
+	  , core    = __webpack_require__(10)
+	  , fails   = __webpack_require__(19);
 	module.exports = function(KEY, exec){
 	  var fn  = (core.Object || {})[KEY] || Object[KEY]
 	    , exp = {};
@@ -748,131 +728,12 @@ webpackJsonp([3],{
 
 /***/ },
 
-/***/ 211:
+/***/ 227:
 /***/ function(module, exports, __webpack_require__) {
 
-	var global    = __webpack_require__(212)
-	  , core      = __webpack_require__(213)
-	  , ctx       = __webpack_require__(214)
-	  , PROTOTYPE = 'prototype';
-
-	var $export = function(type, name, source){
-	  var IS_FORCED = type & $export.F
-	    , IS_GLOBAL = type & $export.G
-	    , IS_STATIC = type & $export.S
-	    , IS_PROTO  = type & $export.P
-	    , IS_BIND   = type & $export.B
-	    , IS_WRAP   = type & $export.W
-	    , exports   = IS_GLOBAL ? core : core[name] || (core[name] = {})
-	    , target    = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE]
-	    , key, own, out;
-	  if(IS_GLOBAL)source = name;
-	  for(key in source){
-	    // contains in native
-	    own = !IS_FORCED && target && key in target;
-	    if(own && key in exports)continue;
-	    // export native or passed
-	    out = own ? target[key] : source[key];
-	    // prevent global pollution for namespaces
-	    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
-	    // bind timers to global for call from export context
-	    : IS_BIND && own ? ctx(out, global)
-	    // wrap global constructors for prevent change them in library
-	    : IS_WRAP && target[key] == out ? (function(C){
-	      var F = function(param){
-	        return this instanceof C ? new C(param) : C(param);
-	      };
-	      F[PROTOTYPE] = C[PROTOTYPE];
-	      return F;
-	    // make static versions for prototype methods
-	    })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
-	    if(IS_PROTO)(exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
-	  }
-	};
-	// type bitmap
-	$export.F = 1;  // forced
-	$export.G = 2;  // global
-	$export.S = 4;  // static
-	$export.P = 8;  // proto
-	$export.B = 16; // bind
-	$export.W = 32; // wrap
-	module.exports = $export;
-
-/***/ },
-
-/***/ 212:
-/***/ function(module, exports) {
-
-	// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-	var global = module.exports = typeof window != 'undefined' && window.Math == Math
-	  ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
-	if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
-
-/***/ },
-
-/***/ 213:
-/***/ function(module, exports) {
-
-	var core = module.exports = {version: '1.2.6'};
-	if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
-
-/***/ },
-
-/***/ 214:
-/***/ function(module, exports, __webpack_require__) {
-
-	// optional / simple context binding
-	var aFunction = __webpack_require__(215);
-	module.exports = function(fn, that, length){
-	  aFunction(fn);
-	  if(that === undefined)return fn;
-	  switch(length){
-	    case 1: return function(a){
-	      return fn.call(that, a);
-	    };
-	    case 2: return function(a, b){
-	      return fn.call(that, a, b);
-	    };
-	    case 3: return function(a, b, c){
-	      return fn.call(that, a, b, c);
-	    };
-	  }
-	  return function(/* ...args */){
-	    return fn.apply(that, arguments);
-	  };
-	};
-
-/***/ },
-
-/***/ 215:
-/***/ function(module, exports) {
-
-	module.exports = function(it){
-	  if(typeof it != 'function')throw TypeError(it + ' is not a function!');
-	  return it;
-	};
-
-/***/ },
-
-/***/ 216:
-/***/ function(module, exports) {
-
-	module.exports = function(exec){
-	  try {
-	    return !!exec();
-	  } catch(e){
-	    return true;
-	  }
-	};
-
-/***/ },
-
-/***/ 217:
-/***/ function(module, exports, __webpack_require__) {
-
-	var toString = __webpack_require__(168);
-	var camelCase = __webpack_require__(167);
-	var upperCase = __webpack_require__(171);
+	var toString = __webpack_require__(228);
+	var camelCase = __webpack_require__(229);
+	var upperCase = __webpack_require__(232);
 	    /**
 	     * camelCase + UPPERCASE first char
 	     */
@@ -887,10 +748,156 @@ webpackJsonp([3],{
 
 /***/ },
 
-/***/ 218:
+/***/ 228:
 /***/ function(module, exports) {
 
-	module.exports = "\n<tabs nav-id=\"tabs-navbar\" :class=\"tabs\">\n\t<tab-pane active icon=\"fa fa-fw fa-file-text-o\" label=\"Docs\">\n\t\t<div class=\"container-fluid docs-container\">\n\t\t\t\n\t\t\t<template v-if=\"component\">\n\t\t\t\t<h1 class=\"component-name\">{{ component.label }}</h1>\n\t\t\t\t<template v-if=\"component.description\">\n\t\t\t\t\t{{{ component.description | unindent | marked }}}\n\t\t\t\t</template>\n\n\t\t\t\t<template v-if=\"component.requirements.length\">\n\t\t\t\t\t<h3>Requirements</h3>\n\t\t\t\t\t<blockquote class=\"warning\">\n\t\t\t\t\t\tThe {{ component.label }} component <strong>must be used</strong> as a child element of\n\t\t\t\t\t\t<template v-for=\"required in component.requirements\">\n\t\t\t\t\t\t\t<a v-link=\"appHelpers.routeToComponent(packageId, required.name)\" v-text=\"required.label\"></a><span v-text=\"$index | separatorLast component.requirements.length\"></span>\n\t\t\t\t\t\t</template>\n\t\t\t\t\t</blockquote>\n\t\t\t\t</template>\n\n\t\t\t\t<template v-if=\"!component.template && !component.mixins.length\">\n\t\t\t\t\t<h3>Warning</h3>\n\t\t\t\t\t<blockquote class=\"warning\">\n\t\t\t\t\t\tThe {{ component.label }} component does not have a template.\n\t\t\t\t\t\t<template v-if=\"extendedBy.length\">\n\t\t\t\t\t\t\tIt's likely that this component is not meant to be used directly. Instead, you probably want to use one of the components extending {{ component.label }}, below.\n\t\t\t\t\t\t</template>\n\t\t\t\t\t</blockquote>\n\t\t\t\t</template>\n\n\t\t\t\t<h3 v-if=\"extendedBy.length || usedBy.length\">Hierarchy</h3>\n\t\t\t\t<template v-if=\"extendedBy.length\">\n\t\t\t\t\t<blockquote>\n\t\t\t\t\t\tThe {{ component.label }} component is extended by:\n\t\t\t\t\t\t<ul class=\"list-unstyled\">\n\t\t\t\t\t\t\t<li v-for=\"extending in extendedBy\">\n\t\t\t\t\t\t\t\t<a v-link=\"appHelpers.routeToComponent(packageId, extending.name)\" v-text=\"extending.label\"></a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t</blockquote>\n\t\t\t\t</template>\n\n\t\t\t\t<template v-if=\"usedBy.length\">\n\t\t\t\t\t<blockquote>\n\t\t\t\t\t\tThe {{ component.label }} component is used by:\n\t\t\t\t\t\t<ul class=\"list-unstyled\">\n\t\t\t\t\t\t\t<li v-for=\"using in usedBy\">\n\t\t\t\t\t\t\t\t<a v-link=\"appHelpers.routeToComponent(packageId, using.name)\" v-text=\"using.label\"></a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t</blockquote>\n\t\t\t\t</template>\n\n\t\t\t\t<template v-if=\"component.components.length\">\n\t\t\t\t\t<h3>Components</h3>\n\t\t\t\t\t<blockquote>\n\t\t\t\t\t\tThe {{ component.label }} component is using:\n\t\t\t\t\t\t<ul class=\"list-unstyled\">\n\t\t\t\t\t\t\t<li v-for=\"used in component.components\">\n\t\t\t\t\t\t\t\t<a v-link=\"appHelpers.routeToComponent(packageId, used.id)\" v-text=\"used.label\"></a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t</blockquote>\n\t\t\t\t</template>\n\n\t\t\t\t<template v-if=\"component.mixins\">\n\t\t\t\t\t<h3>Mixins</h3>\n\t\t\t\t\t<blockquote>\n\t\t\t\t\t\tThe {{ component.label }} component extends:\n\t\t\t\t\t\t<ul class=\"list-unstyled\">\n\t\t\t\t\t\t\t<li v-for=\"mix in component.mixins\">\n\t\t\t\t\t\t\t\t<a v-link=\"appHelpers.routeToComponent(packageId, mix.name)\" v-text=\"mix.label\"></a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t</blockquote>\n\t\t\t\t</template>\n\n\t\t\t\t<hr>\n\n\t\t\t\t<template v-if=\"component.slots.length\">\n\t\t\t\t\t<h3>Slots</h3>\n\t\t\t\t\t<blockquote>\n\t\t\t\t\t\t<p>A <strong>slot</strong> is a special attribute that instructs the component's parent how to distribute content.</p>\n\t\t\t\t\t\t<small>You can learn more about <a href=\"http://vuejs.org/guide/components.html#Content_Distribution_with_Slots\">Content Distribution with Slots in Vue.js components</a></small>\n\t\t\t\t\t</blockquote>\n\t\t\t\t\t<p>The {{ component.label }} component can have the following slot attribute values:</p>\n\t\t\t\t\t<template v-for=\"slot in component.slots\">\n\t\t\t\t\t\t<div class=\"panel panel-default panel-body\">\n\t\t\t\t\t\t\t<h4>{{ slot.name }}</h4>\n\t\t\t\t\t\t\t<p v-if=\"slot.description\">{{{ slot.description | unindent | marked }}}</p>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</template>\n\t\t\t\t\t<hr>\n\t\t\t\t</template>\n\n\t\t\t\t<template v-if=\"component.props\">\n\t\t\t\t\t<h3>Properties</h3>\n\t\t\t\t\t<blockquote>\n\t\t\t\t\t\t<p>Properties define how the component expects to receive data from its parent.</p>\n\t\t\t\t\t\t<small>You can learn more about <a href=\"http://vuejs.org/guide/components.html#Passing_Data_with_Props\">Passing Data with Props in Vue.js components</a></small>\n\t\t\t\t\t</blockquote>\n\t\t\t\t\t<p>The {{ component.label }} component exposes the following properties:</p>\n\t\t\t\t\t<template v-for=\"prop in component.props\">\n\t\t\t\t\t\t<div class=\"panel panel-default panel-body\">\n\t\t\t\t\t\t\t<h4>{{ prop.name }}</h4>\n\t\t\t\t\t\t\t<template v-if=\"prop.description\">{{{ prop.description | unindent | marked }}}</template>\n\t\t\t\t\t\t\t<h5 v-if=\"prop.type\">type: <code>{{ prop.type }}</code></h5>\n\t\t\t\t\t\t\t<h5 v-if=\"prop.default\">default: <code>{{ prop.default }}</code></h5>\n\t\t\t\t\t\t\t<h5 v-if=\"prop.required\">required: <code>true</code></h5>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</template>\n\t\t\t\t\t<hr>\n\t\t\t\t</template>\n\n\t\t\t\t<template v-if=\"component.events.length\">\n\t\t\t\t\t<h3>Event listeners</h3>\n\t\t\t\t\t<p>The {{ component.label }} component listens and responds to the following events:</p>\n\t\t\t\t\t<template v-for=\"event in component.events\">\n\t\t\t\t\t\t<h4>{{ event.name }}</h4>\n\t\t\t\t\t\t<p v-if=\"event.description\">{{{ event.description | unindent | marked }}}</p>\n\t\t\t\t\t\t<pre><code v-highlight=\"event.event\" lang=\"javascript\"></code></pre>\n\t\t\t\t\t</template>\n\t\t\t\t</template>\n\t\t\t</template>\n\n\t\t\t<template v-if=\"!component\">\n\t\t\t\t<div class=\"alert alert-default\" v-if=\"serviceLoading\">Loading data ...</div>\n\t\t\t\t<template v-else>\n\t\t\t\t\t<h1>{{ componentId }}</h1>\n\t\t\t\t\t<h3>The component was not found.</h3>\n\t\t\t\t</template>\n\t\t\t</template>\n\t\t</div>\n\t</tab-pane>\n\t<tab-pane id=\"demo\" label=\"Demo\" v-if=\"component.demo\">\n\t\t<iframe :src=\"component.demo\" frameborder=\"0\"></iframe>\n\t</tab-pane>\n</tabs>\n";
+	
+
+	    /**
+	     * Typecast a value to a String, using an empty string value for null or
+	     * undefined.
+	     */
+	    function toString(val){
+	        return val == null ? '' : val.toString();
+	    }
+
+	    module.exports = toString;
+
+
+
+
+/***/ },
+
+/***/ 229:
+/***/ function(module, exports, __webpack_require__) {
+
+	var toString = __webpack_require__(228);
+	var replaceAccents = __webpack_require__(230);
+	var removeNonWord = __webpack_require__(231);
+	var upperCase = __webpack_require__(232);
+	var lowerCase = __webpack_require__(233);
+	    /**
+	    * Convert string to camelCase text.
+	    */
+	    function camelCase(str){
+	        str = toString(str);
+	        str = replaceAccents(str);
+	        str = removeNonWord(str)
+	            .replace(/[\-_]/g, ' ') //convert all hyphens and underscores to spaces
+	            .replace(/\s[a-z]/g, upperCase) //convert first char of each word to UPPERCASE
+	            .replace(/\s+/g, '') //remove spaces
+	            .replace(/^[A-Z]/g, lowerCase); //convert first char to lowercase
+	        return str;
+	    }
+	    module.exports = camelCase;
+
+
+
+/***/ },
+
+/***/ 230:
+/***/ function(module, exports, __webpack_require__) {
+
+	var toString = __webpack_require__(228);
+	    /**
+	    * Replaces all accented chars with regular ones
+	    */
+	    function replaceAccents(str){
+	        str = toString(str);
+
+	        // verifies if the String has accents and replace them
+	        if (str.search(/[\xC0-\xFF]/g) > -1) {
+	            str = str
+	                    .replace(/[\xC0-\xC5]/g, "A")
+	                    .replace(/[\xC6]/g, "AE")
+	                    .replace(/[\xC7]/g, "C")
+	                    .replace(/[\xC8-\xCB]/g, "E")
+	                    .replace(/[\xCC-\xCF]/g, "I")
+	                    .replace(/[\xD0]/g, "D")
+	                    .replace(/[\xD1]/g, "N")
+	                    .replace(/[\xD2-\xD6\xD8]/g, "O")
+	                    .replace(/[\xD9-\xDC]/g, "U")
+	                    .replace(/[\xDD]/g, "Y")
+	                    .replace(/[\xDE]/g, "P")
+	                    .replace(/[\xE0-\xE5]/g, "a")
+	                    .replace(/[\xE6]/g, "ae")
+	                    .replace(/[\xE7]/g, "c")
+	                    .replace(/[\xE8-\xEB]/g, "e")
+	                    .replace(/[\xEC-\xEF]/g, "i")
+	                    .replace(/[\xF1]/g, "n")
+	                    .replace(/[\xF2-\xF6\xF8]/g, "o")
+	                    .replace(/[\xF9-\xFC]/g, "u")
+	                    .replace(/[\xFE]/g, "p")
+	                    .replace(/[\xFD\xFF]/g, "y");
+	        }
+	        return str;
+	    }
+	    module.exports = replaceAccents;
+
+
+
+/***/ },
+
+/***/ 231:
+/***/ function(module, exports, __webpack_require__) {
+
+	var toString = __webpack_require__(228);
+	    // This pattern is generated by the _build/pattern-removeNonWord.js script
+	    var PATTERN = /[^\x20\x2D0-9A-Z\x5Fa-z\xC0-\xD6\xD8-\xF6\xF8-\xFF]/g;
+
+	    /**
+	     * Remove non-word chars.
+	     */
+	    function removeNonWord(str){
+	        str = toString(str);
+	        return str.replace(PATTERN, '');
+	    }
+
+	    module.exports = removeNonWord;
+
+
+
+/***/ },
+
+/***/ 232:
+/***/ function(module, exports, __webpack_require__) {
+
+	var toString = __webpack_require__(228);
+	    /**
+	     * "Safer" String.toUpperCase()
+	     */
+	    function upperCase(str){
+	        str = toString(str);
+	        return str.toUpperCase();
+	    }
+	    module.exports = upperCase;
+
+
+
+/***/ },
+
+/***/ 233:
+/***/ function(module, exports, __webpack_require__) {
+
+	var toString = __webpack_require__(228);
+	    /**
+	     * "Safer" String.toLowerCase()
+	     */
+	    function lowerCase(str){
+	        str = toString(str);
+	        return str.toLowerCase();
+	    }
+
+	    module.exports = lowerCase;
+
+
+
+/***/ },
+
+/***/ 234:
+/***/ function(module, exports) {
+
+	module.exports = "\n<tabs nav-id=\"tabs-navbar\" :class=\"tabs\">\n\t<tab-pane id=\"demo\" label=\"Demo\" v-show=\"hasDemos\" :active=\"hasDemos\" :visible=\"hasDemos\">\n\t\t<iframe v-if=\"hasDemos\" :src=\"demos[0].url\" frameborder=\"0\"></iframe>\n\t</tab-pane>\n\t<tab-pane :active=\"!hasDemos\" icon=\"fa fa-fw fa-file-text-o\" label=\"Docs\">\n\t\t<div class=\"container-fluid docs-container\">\n\t\t\t\n\t\t\t<template v-if=\"component\">\n\t\t\t\t<h1 class=\"component-name\">{{ component.label }}</h1>\n\t\t\t\t<template v-if=\"component.description\">\n\t\t\t\t\t{{{ component.description.data | marked }}}\n\t\t\t\t</template>\n\n\t\t\t\t<template v-if=\"component.requirements.length\">\n\t\t\t\t\t<h3>Requirements</h3>\n\t\t\t\t\t<blockquote class=\"warning\">\n\t\t\t\t\t\tThe {{ component.label }} component <strong>must be used</strong> as a child element of\n\t\t\t\t\t\t<template v-for=\"required in component.requirements\">\n\t\t\t\t\t\t\t<a v-link=\"appHelpers.routeToComponent(packageId, required.name)\" v-text=\"required.label\"></a><span v-text=\"$index | separatorLast component.requirements.length\"></span>\n\t\t\t\t\t\t</template>\n\t\t\t\t\t</blockquote>\n\t\t\t\t</template>\n\n\t\t\t\t<template v-if=\"!component.template && !component.mixins.length\">\n\t\t\t\t\t<h3>Warning</h3>\n\t\t\t\t\t<blockquote class=\"warning\">\n\t\t\t\t\t\tThe {{ component.label }} component does not have a template.\n\t\t\t\t\t\t<template v-if=\"extendedBy.length\">\n\t\t\t\t\t\t\tIt's likely that this component is not meant to be used directly. Instead, you probably want to use one of the components extending {{ component.label }}, below.\n\t\t\t\t\t\t</template>\n\t\t\t\t\t</blockquote>\n\t\t\t\t</template>\n\n\t\t\t\t<h3 v-if=\"extendedBy.length || usedBy.length\">Hierarchy</h3>\n\t\t\t\t<template v-if=\"extendedBy.length\">\n\t\t\t\t\t<blockquote>\n\t\t\t\t\t\tThe {{ component.label }} component is extended by:\n\t\t\t\t\t\t<ul class=\"list-unstyled\">\n\t\t\t\t\t\t\t<li v-for=\"extending in extendedBy\">\n\t\t\t\t\t\t\t\t<a v-link=\"appHelpers.routeToComponent(packageId, extending.name)\" v-text=\"extending.label\"></a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t</blockquote>\n\t\t\t\t</template>\n\n\t\t\t\t<template v-if=\"usedBy.length\">\n\t\t\t\t\t<blockquote>\n\t\t\t\t\t\tThe {{ component.label }} component is used by:\n\t\t\t\t\t\t<ul class=\"list-unstyled\">\n\t\t\t\t\t\t\t<li v-for=\"using in usedBy\">\n\t\t\t\t\t\t\t\t<a v-link=\"appHelpers.routeToComponent(packageId, using.name)\" v-text=\"using.label\"></a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t</blockquote>\n\t\t\t\t</template>\n\n\t\t\t\t<template v-if=\"component.components.length\">\n\t\t\t\t\t<h3>Components</h3>\n\t\t\t\t\t<blockquote>\n\t\t\t\t\t\tThe {{ component.label }} component is using:\n\t\t\t\t\t\t<ul class=\"list-unstyled\">\n\t\t\t\t\t\t\t<li v-for=\"used in component.components\">\n\t\t\t\t\t\t\t\t<a v-link=\"appHelpers.routeToComponent(packageId, used.id)\" v-text=\"used.label\"></a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t</blockquote>\n\t\t\t\t</template>\n\n\t\t\t\t<template v-if=\"component.mixins\">\n\t\t\t\t\t<h3>Mixins</h3>\n\t\t\t\t\t<blockquote>\n\t\t\t\t\t\tThe {{ component.label }} component extends:\n\t\t\t\t\t\t<ul class=\"list-unstyled\">\n\t\t\t\t\t\t\t<li v-for=\"mix in component.mixins\">\n\t\t\t\t\t\t\t\t<a v-link=\"appHelpers.routeToComponent(packageId, mix.name)\" v-text=\"mix.label\"></a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t</blockquote>\n\t\t\t\t</template>\n\n\t\t\t\t<hr>\n\n\t\t\t\t<template v-if=\"component.slots.length\">\n\t\t\t\t\t<h3>Slots</h3>\n\t\t\t\t\t<blockquote>\n\t\t\t\t\t\t<p>A <strong>slot</strong> is a special attribute that instructs the component's parent how to distribute content.</p>\n\t\t\t\t\t\t<small>You can learn more about <a href=\"http://vuejs.org/guide/components.html#Content_Distribution_with_Slots\">Content Distribution with Slots in Vue.js components</a></small>\n\t\t\t\t\t</blockquote>\n\t\t\t\t\t<p>The {{ component.label }} component can have the following slot attribute values:</p>\n\t\t\t\t\t<template v-for=\"slot in component.slots\">\n\t\t\t\t\t\t<div class=\"panel panel-default panel-body\">\n\t\t\t\t\t\t\t<h4>{{ slot.name }}</h4>\n\t\t\t\t\t\t\t<p v-if=\"slot.description\">{{{ slot.description | marked }}}</p>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</template>\n\t\t\t\t\t<hr>\n\t\t\t\t</template>\n\n\t\t\t\t<template v-if=\"component.props.length\">\n\t\t\t\t\t<h3>Properties</h3>\n\t\t\t\t\t<blockquote>\n\t\t\t\t\t\t<p>Properties define how the component expects to receive data from its parent.</p>\n\t\t\t\t\t\t<small>You can learn more about <a href=\"http://vuejs.org/guide/components.html#Passing_Data_with_Props\">Passing Data with Props in Vue.js components</a></small>\n\t\t\t\t\t</blockquote>\n\t\t\t\t\t<p>The {{ component.label }} component exposes the following properties:</p>\n\t\t\t\t\t<template v-for=\"prop in component.props\">\n\t\t\t\t\t\t<div class=\"panel panel-default panel-body\">\n\t\t\t\t\t\t\t<h4>{{ prop.prop.name }}</h4>\n\t\t\t\t\t\t\t<template v-if=\"prop.description\">{{{ prop.description.data | marked }}}</template>\n\t\t\t\t\t\t\t<h5 v-if=\"prop.prop.type\">type: <code>{{ prop.prop.type }}</code></h5>\n\t\t\t\t\t\t\t<h5 v-if=\"prop.prop.default\">default: <code>{{ prop.prop.default }}</code></h5>\n\t\t\t\t\t\t\t<h5 v-if=\"prop.prop.required\">required: <code>true</code></h5>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</template>\n\t\t\t\t\t<hr>\n\t\t\t\t</template>\n\n\t\t\t\t<template v-if=\"component.events.length\">\n\t\t\t\t\t<h3>Event listeners</h3>\n\t\t\t\t\t<p>The {{ component.label }} component listens and responds to the following events:</p>\n\t\t\t\t\t<template v-for=\"event in component.events\">\n\t\t\t\t\t\t<h4>{{ event.name }}</h4>\n\t\t\t\t\t\t<p v-if=\"event.description\">{{{ event.description | unindent | marked }}}</p>\n\t\t\t\t\t\t<pre><code v-highlight=\"event.event\" lang=\"javascript\"></code></pre>\n\t\t\t\t\t</template>\n\t\t\t\t</template>\n\t\t\t</template>\n\n\t\t\t<template v-if=\"!component && !serviceLoading && appState.pkg\">\n\t\t\t\t<template v-else>\n\t\t\t\t\t<h1>{{ componentId }}</h1>\n\t\t\t\t\t<h3>The component was not found.</h3>\n\t\t\t\t</template>\n\t\t\t</template>\n\n\t\t\t<div class=\"alert alert-default\" v-if=\"serviceLoading && !component\">Loading data ...</div>\n\t\t</div>\n\t</tab-pane>\n</tabs>\n";
 
 /***/ }
 
