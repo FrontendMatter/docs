@@ -8,20 +8,15 @@
 		<!-- Display list -->
 		<isotope v-if="!serviceLoading && packages.length">
 			<isotope-item class="col-md-4" v-for="package in packages">
-				<div class="panel panel-default panel-package" v-link="appHelpers.routeToPackage(package.objectId)">
+				<div class="panel panel-default panel-package" v-link="appHelpers.routeToPackage(package.packageIdData.packageName, package.packageVersionIdData.version)">
 					<div class="panel-heading">
 						<h4 class="panel-title">
-							{{ package.name }}
+							<a v-link="appHelpers.routeToPackage(package.packageIdData.packageName, package.packageVersionIdData.version)">{{ package.packageIdData.packageName }}</a>
 						</h4>
 					</div>
-					<template v-if="package.content">
-						<div class="panel-body">
-							{{ package.content | excerpt 60 }}
-						</div>
-						<hr>
-					</template>
-					<div class="panel-body text-center">
-						<strong>{{ package.components }}</strong> components
+					<div class="panel-body">
+						<span class="label label-default">{{ package.packageVersionIdData.version }}</span>
+						<template v-if="package.description">{{ package.description.data }}</template>
 					</div>
 				</div>
 			</isotope-item>
@@ -40,21 +35,21 @@
 	import appStore from 'themekit-docs/src/js/app.store'
 	import Store from 'themekit-docs/src/mixins/store'
 	import { Isotope, IsotopeItem } from 'vue-isotope'
-	import crop from 'mout/string/crop'
 
 	export default {
 		mixins: [
 			Store
 		],
-		filters: {
-			excerpt: function (value, length) {
-				return crop(value, length || 30)
+		route: {
+			activate () {
+				this.appState.page.title = 'Packages'
 			}
 		},
 		data () {
 			return {
 				packages: [],
-				appHelpers: appStore.helpers
+				appHelpers: appStore.helpers,
+				appState: appStore.state
 			}
 		},
 		created () {

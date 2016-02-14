@@ -1,56 +1,58 @@
 <template>
 	<div class="container-fluid docs-container">
-		<template v-if="pkg">
-			<h1>{{ pkg.name }}</h1>
-			<template v-if="pkg.content">
-				{{{ pkg.content | marked }}}
+		<template v-if="appState.pkg">
+			<h1>{{ appState.pkg.packageIdData.packageName }}</h1>
+			<template v-if="appState.pkg.description">
+				{{{ appState.pkg.description.data | marked }}}
+			</template>
+			<template v-if="appState.pkg.readme">
+				{{{ appState.pkg.readme.data | marked }}}
 			</template>
 		</template>
 
-		<template v-if="!pkg">
-			<div class="alert alert-default" v-if="serviceLoading">Loading data ...</div>
+		<template v-if="!appState.pkg && !serviceLoading">
 			<template v-else>
-				<h1>{{ packageId }}</h1>
+				<h1>{{ packageName }}</h1>
 				<h3>The package was not found.</h3>
 			</template>
 		</template>
+
+		<div class="alert alert-default" v-if="serviceLoading && !appState.pkg">Loading data ...</div>
 	</div>
 </template>
 
 <script>
+	import appStore from 'themekit-docs/src/js/app.store'
 	import Store from 'themekit-docs/src/mixins/store'
-	import marked from 'marked'
-
-	marked.setOptions({
-		highlight: function (code) {
-			return require('highlight.js').highlightAuto(code).value
-		}
-	})
 
 	export default {
 		mixins: [
 			Store
 		],
-		filters: {
-			marked: marked
-		},
 		data () {
 			return {
-				pkg: null
+				appState: appStore.state
 			}
 		},
-		route: {
-			canReuse: false
-		},
 		computed: {
-			packageId () {
-				return this.$route.params.id
+			packageName () {
+				return this.$route.params.packageName
+			},
+			version () {
+				return this.$route.params.version
+			}
+		},
+		methods: {
+			updateTitle () {
+				this.appState.page.title = `${ this.packageName } (${ this.version })`
 			}
 		},
 		created () {
-			this.store.getPackage(this.packageId).then((pkg) => {
-				this.pkg = pkg
-			})
+			this.updateTitle()
+		},
+		watch: {
+			'packageName': 'updateTitle',
+			'version': 'updateTitle'
 		}
 	}
 </script>

@@ -1,8 +1,15 @@
 // The main application
+import Vue from 'vue'
 import App from '../views/main'
+
+// Router requires a component to start
+const Main = Vue.extend({
+	replace: false,
+	components: { App }
+})
 
 // Vue router
 import router from './router.main'
 
-// Important: App.replace must be 'false' or it will replace the entire 'body' tag
-router.start(App, 'body')
+// Start
+router.start(Main, 'body')

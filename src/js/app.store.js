@@ -1,9 +1,10 @@
 /* eslint no-undef:0 */
-function routeToPackage (routeName, packageId) {
+function routeToPackage (routeName, packageName, version = 'latest') {
 	return {
 		name: routeName,
 		params: {
-			id: packageId
+			packageName,
+			version
 		}
 	}
 }
@@ -21,27 +22,33 @@ export default {
 		}
 	},
 	state: {
-		components: null
+		pkg: null,
+		components: null,
+		page: {
+			appTitle: 'ThemeKit Documentation',
+			title: null
+		}
 	},
 	helpers: {
-		routeToPackage (packageId) {
-			return routeToPackage('package', packageId)
+		routeToPackage (packageName, version) {
+			return routeToPackage('package', packageName, version)
 		},
-		routeToComponent (packageId, componentId) {
+		routeToComponent (packageName, version = 'latest', componentName) {
 			return {
 				name: 'component',
 				params: {
-					id: packageId,
-					componentId
+					packageName,
+					componentName,
+					version
 				}
 			}
 		},
-		routeToPage (packageId, slug, pageId) {
+		routeToPage (packageName, version = 'latest', pageId) {
 			return {
 				name: 'page',
 				params: {
-					id: packageId,
-					slug,
+					packageName,
+					version,
 					pageId
 				}
 			}
@@ -51,11 +58,11 @@ export default {
 				name: 'packages'
 			}
 		},
-		routeToPackageComponents (packageId) {
-			return routeToPackage('package.components', packageId)
+		routeToPackageComponents (packageName, version) {
+			return routeToPackage('package.components', packageName, version)
 		},
-		routeToPackagePages (packageId) {
-			return routeToPackage('package.pages', packageId)
+		routeToPackagePages (packageName, version) {
+			return routeToPackage('package.pages', packageName, version)
 		}
 	}
 }

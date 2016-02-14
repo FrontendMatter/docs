@@ -9,7 +9,7 @@
 				<template v-if="component">
 					<h1 class="component-name">{{ component.label }}</h1>
 					<template v-if="component.description">
-						{{{ component.description | unindent | marked }}}
+						{{{ component.description.data | marked }}}
 					</template>
 
 					<template v-if="component.requirements.length">
@@ -91,13 +91,13 @@
 						<template v-for="slot in component.slots">
 							<div class="panel panel-default panel-body">
 								<h4>{{ slot.name }}</h4>
-								<p v-if="slot.description">{{{ slot.description | unindent | marked }}}</p>
+								<p v-if="slot.description">{{{ slot.description | marked }}}</p>
 							</div>
 						</template>
 						<hr>
 					</template>
 
-					<template v-if="component.props">
+					<template v-if="component.props.length">
 						<h3>Properties</h3>
 						<blockquote>
 							<p>Properties define how the component expects to receive data from its parent.</p>
@@ -106,11 +106,11 @@
 						<p>The {{ component.label }} component exposes the following properties:</p>
 						<template v-for="prop in component.props">
 							<div class="panel panel-default panel-body">
-								<h4>{{ prop.name }}</h4>
-								<template v-if="prop.description">{{{ prop.description | unindent | marked }}}</template>
-								<h5 v-if="prop.type">type: <code>{{ prop.type }}</code></h5>
-								<h5 v-if="prop.default">default: <code>{{ prop.default }}</code></h5>
-								<h5 v-if="prop.required">required: <code>true</code></h5>
+								<h4>{{ prop.prop.name }}</h4>
+								<template v-if="prop.description">{{{ prop.description.data | marked }}}</template>
+								<h5 v-if="prop.prop.type">type: <code>{{ prop.prop.type }}</code></h5>
+								<h5 v-if="prop.prop.default">default: <code>{{ prop.prop.default }}</code></h5>
+								<h5 v-if="prop.prop.required">required: <code>true</code></h5>
 							</div>
 						</template>
 						<hr>
@@ -127,13 +127,14 @@
 					</template>
 				</template>
 
-				<template v-if="!component">
-					<div class="alert alert-default" v-if="serviceLoading">Loading data ...</div>
+				<template v-if="!component && !serviceLoading && appState.pkg">
 					<template v-else>
 						<h1>{{ componentId }}</h1>
 						<h3>The component was not found.</h3>
 					</template>
 				</template>
+
+				<div class="alert alert-default" v-if="serviceLoading && !component">Loading data ...</div>
 			</div>
 		</tab-pane>
 	</tabs>
@@ -142,29 +143,14 @@
 <script>
 	import appStore from 'themekit-docs/src/js/app.store'
 	import Store from 'themekit-docs/src/mixins/store'
-	import { Tabs } from 'themekit-vue'
-	import { TabPane } from 'themekit-vue'
+	import { Tabs, TabPane } from 'themekit-vue'
 	import pascalCase from 'mout/string/pascalCase'
-
-	function unindent (str) {
-		var match = str.match(/^[ \t]*(?=\S)/gm)
-		if (!match) {
-			return str
-		}
-		var indent = Math.min.apply(Math, match.map(function (el) {
-			return el.length
-		}))
-		var re = new RegExp('^[ \\t]{' + indent + '}', 'gm')
-		return indent > 0 ? str.replace(re, '') : str
-	}
 
 	export default {
 		mixins: [
 			Store
 		],
 		filters: {
-			marked: window.marked,
-			unindent: unindent,
 			separatorLast: function ($index, $length, separator, lastSeparator) {
 				if ($index === $length - 2) {
 					return lastSeparator || ' or '
@@ -179,19 +165,18 @@
 				component: null,
 				tabId: null,
 				appState: appStore.state,
-				appHelpers: appStore.helpers,
-				demos: []
+				appHelpers: appStore.helpers
 			}
 		},
-		route: {
-			canReuse: false
-		},
 		computed: {
-			componentId () {
-				return this.$route.params.componentId
+			componentName () {
+				return this.$route.params.componentName
 			},
-			packageId () {
-				return this.$route.params.id
+			packageName () {
+				return this.$route.params.packageName
+			},
+			version () {
+				return this.$route.params.version
 			},
 			components () {
 				return this.appState.components
@@ -218,26 +203,29 @@
 					'tabs-demo': this.tabId === 'demo'
 				}
 			},
+			demos () {
+				if (this.component) {
+					return this.component.demos
+				}
+				return []
+			},
 			hasDemos () {
 				return this.demos.length > 0
 			}
 		},
 		created () {
-			this.store.getComponent(this.componentId).then(({ merge }) => {
-				this.component = merge
-			})
-			this.store.getComponentDemos(this.componentId).then((demos) => {
-				demos.map((demo) => {
-					const exists = this.demos.find((d) => d.objectId === demo.objectId)
-					if (!exists) {
-						this.demos.push(demo)
-					}
-				})
-			})
+			this.store.getComponentVersionByName(this.componentName, this.packageName, this.version).then((data) => this.component = data)
 		},
 		events: {
 			'shown.tk.tab': function (tabId) {
 				this.tabId = tabId
+			}
+		},
+		watch: {
+			component (value) {
+				if (value) {
+					this.appState.page.title = this.component.label
+				}
 			}
 		},
 		components: {

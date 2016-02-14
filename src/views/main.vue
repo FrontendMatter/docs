@@ -20,13 +20,11 @@
 			<tabs-nav nav-id="tabs-navbar"></tabs-nav>
 
 			<div class="navbar-form navbar-left">
-				<algolia-instantsearch-dropdown
+				<algolia-search-dropdown
 					:algolia-app-id="appConfig.algolia.appId"
 					:algolia-api-key="appConfig.algolia.apiKey"
-					algolia-index="components"
-					:transform-hit="transformHit"
-					search-box-placeholder="Search components ...">
-				</algolia-instantsearch-dropdown>
+					:algolia-indices="algoliaIndices">
+				</algolia-search-dropdown>
 			</div>
 			
 		</navbar>
@@ -41,17 +39,24 @@
 			size="3"
 			effect="reveal">
 
-			<template v-if="isPackageView">
+			<a v-link="appHelpers.routeToPackages()" slot="brand" class="sidebar-brand"><i class="fa fa-fw fa-chevron-left"></i> Packages</a>
 
-				<a v-link="appHelpers.routeToPackages()" slot="brand" class="sidebar-brand"><i class="fa fa-fw fa-chevron-left"></i> Packages</a>
+			<!-- Service Loading -->
+			<p v-if="serviceLoading && !appState.pkg" class="sidebar-text">Loading ...</p>
 
-				<div class="sidebar-block bg-white" v-if="pkg">
-					<h4 class="sidebar-category">{{ pkg.name }}</h4>
-					<a v-link="appHelpers.routeToPackage(packageId)">Package Overview</a>
+			<template v-if="appState.pkg">
+				<!-- Package menu -->
+				<div class="sidebar-block bg-white">
+					<h4 class="sidebar-category">{{ appState.pkg.packageIdData.packageName }}</h4>
+					<p><a v-link="appHelpers.routeToPackage(packageName, version)">Package Overview</a></p>
+					<!-- Versions -->
+					<div class="form-group" v-if="versions.length">
+						<label for="version">Version</label>
+						<select id="version" class="form-control" v-model="selectedVersion">
+							<option v-for="v in versions" value="{{ v.version }}" :selected="v.version === version">{{ v.version }}</option>
+						</select>
+					</div>
 				</div>
-
-				<!-- Service Loading -->
-				<p v-if="!components.length && serviceLoading" class="sidebar-text">Loading ...</p>
 
 				<!-- Sidebar Menus -->
 				<sidebar-menu 
@@ -87,39 +92,52 @@
 <script>
 	import appStore from 'themekit-docs/src/js/app.store'
 	import Store from 'themekit-docs/src/mixins/store'
-	import { AlgoliaInstantsearchDropdown } from 'vue-algolia'
-	import { LayoutTransition } from 'themekit-vue'
-	import { SidebarTransition } from 'themekit-vue'
-	import { SidebarToggleButton } from 'themekit-vue'
-	import { SidebarMenu } from 'themekit-vue'
-	import { SidebarCollapseItem } from 'themekit-vue'
-	import { Navbar } from 'themekit-vue'
-	import { TabsNav } from 'themekit-vue'
+	import { AlgoliaSearchDropdown } from 'vue-algolia'
+	import { LayoutTransition, SidebarTransition } from 'themekit-vue'
+	import { SidebarMenu, SidebarCollapseItem } from 'themekit-vue'
+	import { Navbar, TabsNav, SidebarToggleButton } from 'themekit-vue'
+	import Vue from 'vue'
 
 	export default {
-		replace: false,
 		mixins: [
 			Store
 		],
 		data () {
 			return {
-				components: [],
-				pages: [],
-				pkg: null,
 				appConfig: appStore.config,
 				appHelpers: appStore.helpers,
-				appState: appStore.state
+				appState: appStore.state,
+				versions: [],
+				selectedVersion: null,
+				pages: [],
+				components: []
 			}
 		},
 		route: {
-			canReuse: false
+			activate: 'pageState'
 		},
 		computed: {
+			page () {
+				return this.appState.page
+			},
+			packageName () {
+				return this.$route.params.packageName
+			},
 			isPackageView () {
-				return this.packageId !== undefined
+				return this.packageName !== undefined
+			},
+			version () {
+				return this.$route.params.version
 			},
 			packageId () {
-				return this.$route.params.id
+				if (this.appState.pkg) {
+					return this.appState.pkg.packageIdData.objectID
+				}
+			},
+			packageVersionId () {
+				if (this.appState.pkg) {
+					return this.appState.pkg.packageVersionIdData.objectID
+				}
 			},
 			menus () { 
 				return [{
@@ -131,8 +149,8 @@
 					},
 					children: this.pages.map((page) => {
 						return {
-							label: page.title,
-							route: this.appHelpers.routeToPage(page.packageId, page.slug, page.objectId)
+							label: page.data.title,
+							route: this.appHelpers.routeToPage(this.packageName, this.version, page.packageVersionPageIdData.pageId)
 						}
 					})
 				}, {
@@ -145,40 +163,110 @@
 					children: this.components.map((component) => {
 						return {
 							label: component.label,
-							route: this.appHelpers.routeToComponent(component.packageId, component.objectId)
+							route: this.appHelpers.routeToComponent(this.packageName, this.version, component.componentIdData.componentName)
 						}
 					})
+				}]
+			},
+			algoliaIndices () {
+				return [{
+					name: 'components',
+					label: 'Components',
+					transformHit: this.transformComponentHit,
+					queryOptions: (() => {
+						let options = {
+							hitsPerPage: 5,
+							distinct: true
+						}
+						if (this.isPackageView) {
+							options = Object.assign({}, options, {
+								facets: '*',
+								facetFilters: [
+									`packageVersionIdData.packageId: ${ this.packageId }`,
+									`packageVersionIdData.version: ${ this.version }`
+								]
+							})
+						}
+						return options
+					})()
+				}, {
+					name: 'packages',
+					label: 'Packages',
+					transformHit: this.transformPackageHit,
+					queryOptions: (() => {
+						let options = {
+							hitsPerPage: 5,
+							distinct: true
+						}
+						return options
+					})()
 				}]
 			}
 		},
 		methods: {
-			transformHit (hit) {
-				hit.route = this.appHelpers.routeToComponent(hit.packageId, hit.objectId)
+			excerpt () {
+				return Vue.filter('excerpt').apply(null, [].slice.call(arguments))
+			},
+			pageState () {
+				document.title = `${ this.page.title } | ${ this.page.appTitle }`
+			},
+			transformComponentHit (hit) {
+				hit.route = this.appHelpers.routeToComponent(hit.packageIdData.packageName, hit.packageVersionIdData.version, hit.componentIdData.componentName)
+				if (hit.description) {
+					hit.description = this.excerpt(hit.description.data)
+				}
 				return hit
 			},
-			loadPackageSidebar () {
-				this.store.getPackageComponents(this.packageId).then((components) => {
-					this.components = components.map(({ merge }) => merge)
-				})
-				this.store.getPages(this.packageId).then((pages) => {
-					this.pages = pages
-				})
+			transformPackageHit (hit) {
+				hit.route = this.appHelpers.routeToPackage(hit.packageIdData.packageName, hit.packageVersionIdData.version)
+				hit.label = hit.packageIdData.packageName
+				if (hit.description) {
+					hit.description = this.excerpt(hit.description.data)
+				}
+				return hit
+			},
+			updateVersion () {
+				this.selectedVersion = this.version
+				this.getPackage()
+			},
+			routeVersion () {
+				if (this.selectedVersion && this.version !== this.selectedVersion) {
+					this.$router.go({ name: this.$route.name, params: { version: this.selectedVersion } })
+				}
+			},
+			getPackage () {
+				if (this.packageName) {
+					return this.store.getPackageVersionByName(this.packageName, this.version).then((pkg) => this.appState.pkg = pkg)
+				}
+				this.appState.pkg = null
+			},
+			getPackageVersions () {
+				if (this.appState.pkg) {
+					this.store.getPackageVersions(this.packageId).then((versions) => this.versions = versions)
+				}
+			},
+			onPackageChanged () {
+				this.components = []
+				this.pages = []
+				if (this.appState.pkg) {
+					this.store.getPackageVersionComponents(this.packageVersionId).then((components) => this.components = components)
+					this.store.getPackageVersionPages(this.packageVersionId).then((pages) => this.pages = pages)
+				}
+				this.getPackageVersions()
 			}
 		},
 		created () {
-			if (this.isPackageView) {
-				this.loadPackageSidebar()
-				this.store.getPackage(this.packageId).then((pkg) => this.pkg = pkg)
-			}
+			this.getPackage()
 		},
 		watch: {
-			packageId (value) {
-				this.components = []
-				this.pages = []
-				if (value) {
-					this.loadPackageSidebar()
-				}
+			page: {
+				handler: 'pageState',
+				deep: true
 			},
+			packageName: 'getPackage',
+			version: 'updateVersion',
+			selectedVersion: 'routeVersion',
+			'appState.pkg': 'onPackageChanged',
 			components (value) {
 				this.appState.components = value
 			}
@@ -191,7 +279,7 @@
 			SidebarCollapseItem,
 			Navbar,
 			TabsNav,
-			AlgoliaInstantsearchDropdown
+			AlgoliaSearchDropdown
 		}
 	}
 </script>

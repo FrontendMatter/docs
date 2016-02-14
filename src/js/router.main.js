@@ -14,19 +14,19 @@ router.map({
 			require(['../views/packages/index'], resolve)
 		}
 	},
-	'/package/:id': {
+	'/package/:packageName/:version': {
 		name: 'package',
 		component: function (resolve) {
 			require(['../views/package/package'], resolve)
 		}
 	},
-	'/package/:id/components/:componentId': {
+	'/package/:packageName/:version/component/:componentName': {
 		name: 'component',
 		component: function (resolve) {
 			require(['../views/package/component'], resolve)
 		}
 	},
-	'/package/:id/pages/:slug/:pageId': {
+	'/package/:packageName/:version/page/:pageId': {
 		name: 'page',
 		component: function (resolve) {
 			require(['../views/package/page'], resolve)
